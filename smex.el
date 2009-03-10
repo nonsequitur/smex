@@ -63,7 +63,7 @@ Must be set before initializing Smex."
         (ido-enable-prefix nil)
         (ido-enable-flex-matching t)
         (ido-max-prospects 10))
-    (ido-completing-read "Smex " choices)))
+    (ido-completing-read "smex " choices)))
 
 (defun smex-prepare-ido-bindings ()
   (define-key ido-completion-map (kbd "C-h f") 'smex-describe-function))
