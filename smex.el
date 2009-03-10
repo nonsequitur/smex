@@ -114,8 +114,14 @@ Must be set before initializing Smex."
   (smex-save-history)
   (smex-rebuild-cache))
 
-(defun smex-auto-update (idle-time)
+(defun smex-update-and-run ()
+  (interactive)
+  (smex-update)
+  (smex))
+
+(defun smex-auto-update (&optional idle-time)
   "Update Smex when Emacs has been idle for IDLE-TIME."
+  (unless idle-time (setq idle-time 60))
   (run-with-idle-timer idle-time t 'smex-update))
 
 (defun smex-initialize ()
