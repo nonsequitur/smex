@@ -126,6 +126,7 @@ Must be set before initializing Smex."
 
 (defun smex-initialize ()
   (interactive)
+  (unless ido-mode (smex-initialize-ido))
   (let ((save-file (expand-file-name smex-save-file)))
     (when (file-readable-p save-file)
       (with-temp-buffer
@@ -134,6 +135,11 @@ Must be set before initializing Smex."
               smex-data (read (current-buffer))))))
   (smex-rebuild-cache)
   (add-hook 'kill-emacs-hook 'smex-save-to-file))
+
+(defun smex-initialize-ido ()
+  "Sets up a minimal Ido environment for `ido-completing-read'."
+  (ido-init-completion-maps)
+  (add-hook 'minibuffer-setup-hook 'ido-minibuffer-setup))
 
 (defun smex-save-history ()
   "Updates `smex-history'"
