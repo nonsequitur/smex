@@ -1,7 +1,18 @@
-;;; smex.el --- Smart Execute
+;;; smex.el --- Smart M-x replacement for Emacs.
 ;; (C) 2009 Cornelius Mika
 ;; Licensed under the same terms as Emacs.
 
+;;; Quick Start:
+;; (require 'smex)
+;; Run this after all your other Emacs packages have been loaded:
+;; (smex-initialize)
+;;
+;; Bind the following commands:
+;; smex, smex-major-mode-commands, smex-update-and-run
+;; 
+;; For a detailed introduction see:
+;; http://github.com/nonsequitur/smex/blob/master/README.markdown
+                     
 (require 'ido)
 ;; Needed for `union'.
 (require 'cl)
