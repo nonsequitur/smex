@@ -100,9 +100,9 @@ Must be set before initializing Smex."
   (if (> (length smex-history) smex-history-length)
       (setcdr (nthcdr (- smex-history-length 1) smex-history) nil))
   (mapc (lambda (command)
-          (unless (eq command (car (car smex-cache)))
+          (unless (eq command (caar smex-cache))
             (let ((command-cell-position (smex-detect-position smex-cache (lambda (cell)
-                                                                (eq command (car (car cell)))))))
+                                                                (eq command (caar cell))))))
               (if command-cell-position
                 (let ((command-cell (smex-remove-nth-cell command-cell-position smex-cache)))
                   (setcdr command-cell smex-cache)
@@ -134,7 +134,7 @@ Must be set before initializing Smex."
   (let ((cell smex-cache))
     (setq smex-history nil)
     (dotimes (i smex-history-length)
-      (setq smex-history (cons (car (car cell)) smex-history))
+      (setq smex-history (cons (caar cell) smex-history))
       (setq cell (cdr cell))))
   (setq smex-history (nreverse smex-history)))
 
