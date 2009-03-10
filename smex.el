@@ -60,6 +60,27 @@ Must be set before initializing Smex."
 ;;--------------------------------------------------------------------------------
 ;; Cache and Maintenance
 
+(defun smex-rebuild-cache ()
+  (interactive)
+  (setq smex-cache nil)
+
+  ;; Build up list 'new-commands' and later put it at the end of 'smex-cache'.
+  ;; This speeds up sorting.
+  (let (new-commands)
+    (mapatoms (lambda (symbol)
+                (when (commandp symbol)
+                  (let ((known-command (assq symbol smex-data)))
+                    (if known-command
+                        (setq smex-cache (cons known-command smex-cache))
+                      (setq new-commands (cons (list symbol) new-commands)))))))
+    (if (eq (length smex-cache) 0)
+        (setq smex-cache new-commands)
+      (setcdr (last smex-cache) new-commands)))
+
+  (setq smex-cache (sort smex-cache 'smex-sorting-rules))
+  (smex-restore-history)
+  (setq smex-ido-cache (smex-convert-for-ido smex-cache)))
+
 (defun smex-convert-for-ido (command-items)
   (mapcar (lambda (command-item) (symbol-name (car command-item))) command-items))
 
