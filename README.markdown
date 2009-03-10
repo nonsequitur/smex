@@ -45,7 +45,7 @@ next/previous match. Enter executes the selected command.
 are relevant to the active major mode. Try it with Dired or Magit.
 
 ### Command help
-`C-h f`, while in the Smex minibuffer, runs `describe-function` on the
+`C-h f`, while Smex is active, runs `describe-function` on the
 currently selected command.
 
 ### Show unbound commands
@@ -71,7 +71,7 @@ argument for a custom time period in seconds.)
 
 ### History
 Set `smex-history-length` to change the number of recent commands that
-Emacs keeps track of.
+Smex keeps track of.
 
 ## Appendix
 
