@@ -144,8 +144,8 @@ Must be set before initializing Smex."
 
 (defun smex-save-history ()
   "Updates `smex-history'"
+  (setq smex-history nil)
   (let ((cell smex-cache))
-    (setq smex-history nil)
     (dotimes (i smex-history-length)
       (setq smex-history (cons (caar cell) smex-history))
       (setq cell (cdr cell))))
@@ -277,13 +277,13 @@ Returns nil when reaching the end of the list."
     (when advice
       (if (current-message)
           (progn
-            (run-at-time 2 nil (lambda (msg)
-                                 (setq smex-save-message (current-message))
-                                 (smex-unlogged-message msg)) advice)
+            (run-at-time 2 nil (lambda (advice)
+                                 (setq smex-old-message (current-message))
+                                 (smex-unlogged-message advice)) advice)
 
-            (run-at-time 4.5 nil (lambda (msg)
-                                 (if (equal (current-message) msg)
-                                     (smex-unlogged-message smex-save-message))) advice))
+            (run-at-time 4.5 nil (lambda (advice)
+                                 (if (equal (current-message) advice)
+                                     (smex-unlogged-message smex-old-message))) advice))
         (smex-unlogged-message advice)))))
 
 (defun smex-key-advice (command)
