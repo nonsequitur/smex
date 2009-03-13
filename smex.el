@@ -1,4 +1,4 @@
-;;; smex.el --- Smart M-x replacement for Emacs.
+;;; smex.el --- A smart M-x enhancement for Emacs.
 ;; (C) 2009 Cornelius Mika
 ;; Licensed under the same terms as Emacs.
 

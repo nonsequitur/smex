@@ -2,7 +2,7 @@
 
 ## Smex
 
-Smex is a M-x replacement for Emacs. Built on top of Ido, it provides
+Smex is a M-x enhancement for Emacs. Built on top of Ido, it provides
 a convenient interface to your recently and most frequently used
 commands. And to all the other commands, too.
 
