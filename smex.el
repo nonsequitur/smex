@@ -31,6 +31,11 @@ Must be set before initializing Smex."
   :type 'integer
   :group 'smex)
 
+(defcustom smex-prompt-string "smex "
+  "String to display in the Smex prompt."
+  :type 'string
+  :group 'smex)
+
 (defvar smex-cache)
 (defvar smex-ido-cache)
 (defvar smex-data)
@@ -63,7 +68,7 @@ Must be set before initializing Smex."
         (ido-enable-prefix nil)
         (ido-enable-flex-matching t)
         (ido-max-prospects 10))
-    (ido-completing-read "smex " choices)))
+    (ido-completing-read smex-prompt-string choices)))
 
 (defun smex-prepare-ido-bindings ()
   (define-key ido-completion-map (kbd "C-h f") 'smex-describe-function)
