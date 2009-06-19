@@ -73,6 +73,9 @@ argument for a custom time period in seconds.)
 Set `smex-history-length` to change the number of recent commands that
 Smex keeps track of.
 
+### Prompt
+Set `smex-prompt-string` for a custom prompt.
+
 ## Appendix
 
 Smex is my first venture into Elisp. I'd be glad to receive patches,
