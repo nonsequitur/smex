@@ -10,14 +10,14 @@ commands. And to all the other commands, too.
 
 * Download Smex.
 
-* Make sure Emacs knows where to find smex.el. [(Find out more.)](http://www.emacswiki.org/emacs/InstallingPackages)
+* Add Smex to your load path. [(Find out more.)](http://www.emacswiki.org/emacs/InstallingPackages)
 
 * To auto-start Smex every time you open Emacs add these lines to your .emacs file:
         (require 'smex)
    Put this line at the very end of your .emacs file:
    (It should be run after all your other Emacs packages have been loaded.)
         (smex-initialize)
-   [Starter Kit](http://github.com/technomancy/emacs-starter-kit/) users do the following:
+   [Starter Kit](http://github.com/technomancy/emacs-starter-kit/) users should add the following instead:
         (eval-after-load "init.el" '(smex-initialize))
    Bind some keys:
         (global-set-key (kbd "M-x") 'smex)
@@ -29,11 +29,9 @@ commands. And to all the other commands, too.
 * Run Smex. (Type M-x, if that's your key binding).
 
 The commands are displayed in an Ido completion buffer, ordered by
-relevance.  The 7 most recently executed commands come first, the
-rest is sorted by frequency of use and in alphabetical order. (When
-you run Smex for the first time, all you see is the alphabetical
-order.)
-   
+relevance.  The 7 most recently executed commands come first, the rest
+are sorted by frequency of use and in alphabetical order.
+
 Ido completion in 10 seconds: Typing selects matching commands:
 e.g. 'lnmd' matches 'line-number-mode'. `C-s`/`C-r` switches to the
 next/previous match. Enter executes the selected command.
