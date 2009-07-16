@@ -169,17 +169,13 @@ Must be set before initializing Smex."
 
 (defun smex-sorting-rules (command-item other-command-item)
   "Returns true if COMMAND-ITEM should sort before OTHER-COMMAND-ITEM."
-  (let ((count (cdr command-item))
-        (name (car command-item))
-        (other-count (cdr other-command-item))
-        (other-name (car other-command-item)))
-    (if count
-        (not (and other-count
-                  (or (< count other-count)
-                      (and (= count other-count)
-                           (string< other-name name)))))
-      (not (or other-count
-               (string< other-name name))))))
+  (let ((count       (or (cdr command-item)       0))
+        (other-count (or (cdr other-command-item) 0))
+        (name        (car command-item))
+        (other-name  (car other-command-item)))
+    (or (> count other-count)              ; 1. Frequency of use
+        (and (= count other-count)
+             (string< name other-name))))) ; 2. Alphabetical order
 
 (defun smex-rank (command)
   (let ((command-item (assq command smex-cache)))
