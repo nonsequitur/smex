@@ -30,7 +30,8 @@ commands. And to all the other commands, too.
 
 The commands are displayed in an Ido completion buffer, ordered by
 relevance.  The 7 most recently executed commands come first, the rest
-are sorted by frequency of use and in alphabetical order.
+are sorted by frequency of use, command length and in alphabetical
+order.
 
 Ido completion in 10 seconds: Typing selects matching commands:
 e.g. 'lnmd' matches 'line-number-mode'. `C-s`/`C-r` switches to the
