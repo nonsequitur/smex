@@ -17,7 +17,7 @@
 ;; Needed for `union'.
 (require 'cl)
 
-(defcustom smex-save-file "~/smex.save"
+(defcustom smex-save-file "~/.smex-items"
   "File in which the smex state is saved between Emacs sessions.
 Variables stored are: `smex-data', `smex-history'.
 Must be set before initializing Smex."
@@ -136,9 +136,20 @@ Must be set before initializing Smex."
   (unless idle-time (setq idle-time 60))
   (run-with-idle-timer idle-time t 'smex-update))
 
+(defun smex-detect-legacy-save-file ()
+  "The default value of `smex-save-file' was changed in between releases.
+This function provides temporary means to aid the transition."
+  (unless (file-readable-p smex-save-file)
+    (let ((legacy-save-file "~/smex.save"))
+      (when (file-readable-p legacy-save-file)
+        (message (format "%s not found. Falling back to %s"
+                         smex-save-file legacy-save-file))
+        (setq smex-save-file legacy-save-file)))))
+
 (defun smex-initialize ()
   (interactive)
   (unless ido-mode (smex-initialize-ido))
+  (smex-detect-legacy-save-file)
   (let ((save-file (expand-file-name smex-save-file)))
     (if (file-readable-p save-file)
       (with-temp-buffer
