@@ -1,4 +1,4 @@
-![Smex](http://cumulatm.googlepages.com/smex-logo.png)
+![Smex](http://sites.google.com/site/cumulatm/home/smex-logo.png)
 
 ## Smex
 
