@@ -14,11 +14,7 @@ commands. And to all the other commands, too.
 
 * To auto-start Smex every time you open Emacs add these lines to your .emacs file:
         (require 'smex)
-   Put this line at the very end of your .emacs file:
-   (It should be run after all your other Emacs packages have been loaded.)
-        (smex-initialize)
-   [Starter Kit](http://github.com/technomancy/emacs-starter-kit/) users should add the following instead:
-        (eval-after-load "init.el" '(smex-initialize))
+        (add-hook 'after-init-hook 'smex-initialize)
    Bind some keys:
         (global-set-key (kbd "M-x") 'smex)
         (global-set-key (kbd "M-X") 'smex-major-mode-commands)
