@@ -47,6 +47,8 @@ are relevant to the active major mode. Try it with Dired or Magit.
 `C-h f`, while Smex is active, runs `describe-function` on the
 currently selected command.
 
+`M-.` jumps to the definition of the selected command.
+
 ### Show unbound commands
 `smex-show-unbound-commands` shows frequently used commands that have
 no key bindings.

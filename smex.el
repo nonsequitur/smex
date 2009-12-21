@@ -40,6 +40,7 @@ Must be set before initializing Smex."
 (defvar smex-ido-cache)
 (defvar smex-data)
 (defvar smex-history)
+(defvar smex-custom-action nil)
 
 ;;--------------------------------------------------------------------------------
 ;; Smex Interface
@@ -48,10 +49,14 @@ Must be set before initializing Smex."
   (interactive)
   (unless commands (setq commands smex-ido-cache))
   (let ((chosen (intern (smex-completing-read commands))))
-    (unwind-protect
-        (call-interactively chosen)
-      (smex-rank chosen)
-      (smex-show-key-advice chosen))))
+    (if smex-custom-action
+        (unwind-protect
+            (funcall smex-custom-action chosen)
+          (setq smex-custom-action nil))
+      (unwind-protect
+          (call-interactively chosen)
+        (smex-rank chosen)
+        (smex-show-key-advice chosen)))))
 
 (defun smex-major-mode-commands ()
   "Like `smex', but limited to commands that are relevant to the active major mode."
@@ -72,6 +77,7 @@ Must be set before initializing Smex."
 
 (defun smex-prepare-ido-bindings ()
   (define-key ido-completion-map (kbd "C-h f") 'smex-describe-function)
+  (define-key ido-completion-map (kbd "M-.") 'smex-find-function)
   (define-key ido-completion-map (kbd "C-a") 'move-beginning-of-line))
 
 ;;--------------------------------------------------------------------------------
@@ -269,10 +275,19 @@ Returns nil when reaching the end of the list."
 ;;--------------------------------------------------------------------------------
 ;; Help and Reference
 
+(defun smex-do-with-selected-item (fn)
+  (setq smex-custom-action fn)
+  (ido-exit-minibuffer))
+
 (defun smex-describe-function ()
   (interactive)
-  (describe-function (intern (car ido-matches)))
-  (pop-to-buffer "*Help*"))
+  (smex-do-with-selected-item (lambda (chosen)
+                           (describe-function chosen)
+                           (pop-to-buffer "*Help*"))))
+
+(defun smex-find-function ()
+  (interactive)
+  (smex-do-with-selected-item 'find-function))
 
 (defvar smex-old-message nil
   "A temporary storage used by `smex-show-key-advice'")
