@@ -9,10 +9,10 @@
 ;;
 ;; Bind the following commands:
 ;; smex, smex-major-mode-commands, smex-update-and-run
-;; 
+;;
 ;; For a detailed introduction see:
 ;; http://github.com/nonsequitur/smex/blob/master/README.markdown
-                     
+
 (require 'ido)
 ;; Needed for `union'.
 (require 'cl)
@@ -152,13 +152,13 @@ This function provides temporary means to aid the transition."
   (smex-detect-legacy-save-file)
   (let ((save-file (expand-file-name smex-save-file)))
     (if (file-readable-p save-file)
-      (with-temp-buffer
-        (insert-file-contents save-file)
-        (setq smex-history (read (current-buffer))
-              smex-data (read (current-buffer))))
+        (with-temp-buffer
+          (insert-file-contents save-file)
+          (setq smex-history (read (current-buffer))
+                smex-data (read (current-buffer))))
       (setq smex-history nil smex-data nil))
-  (smex-rebuild-cache)
-  (add-hook 'kill-emacs-hook 'smex-save-to-file)))
+    (smex-rebuild-cache)
+    (add-hook 'kill-emacs-hook 'smex-save-to-file)))
 
 (defun smex-initialize-ido ()
   "Sets up a minimal Ido environment for `ido-completing-read'."
@@ -243,7 +243,7 @@ This function provides temporary means to aid the transition."
          (command-item (car command-cell))
          (command-count (cdr command-item)))
     (let ((insert-at (smex-detect-position command-cell (lambda (cell)
-                                                          (smex-sorting-rules command-item (car cell))))))
+                       (smex-sorting-rules command-item (car cell))))))
       ;; TODO: Should we handle the case of 'insert-at' being nil?
       ;; This will never happen in practice.
       (when (> insert-at 1)
