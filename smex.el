@@ -31,7 +31,7 @@ Must be set before initializing Smex."
   :type 'integer
   :group 'smex)
 
-(defcustom smex-prompt-string "smex "
+(defcustom smex-prompt-string "M-x "
   "String to display in the Smex prompt."
   :type 'string
   :group 'smex)
