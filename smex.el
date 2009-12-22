@@ -199,9 +199,10 @@ This function provides temporary means to aid the transition."
                       (string< name other-name))))))) ; 3. Alphabetical order
 
 (defun smex-rank (command)
-  (let ((command-item (assq command smex-cache)))
-    ;; TODO: Should we first update the cache and
-    ;; then try again if command-item is nil?
+  (let ((command-item (or (assq command smex-cache)
+                          ;; Update caches and try again if not found.
+                          (progn (smex-update)
+                                 (assq command smex-cache)))))
     (when command-item
       (smex-update-count command-item)
 
