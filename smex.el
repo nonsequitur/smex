@@ -40,6 +40,7 @@ Must be set before initializing Smex."
 (defvar smex-ido-cache)
 (defvar smex-data)
 (defvar smex-history)
+(defvar smex-chosen)
 (defvar smex-custom-action nil)
 
 ;;--------------------------------------------------------------------------------
@@ -48,16 +49,19 @@ Must be set before initializing Smex."
 (defun smex (&optional commands)
   (interactive)
   (unless commands (setq commands smex-ido-cache))
-  (let ((chosen (intern (smex-completing-read commands))))
-    (if smex-custom-action
-        (unwind-protect
-            (funcall smex-custom-action chosen)
-          (setq smex-custom-action nil))
+  (setq smex-chosen (intern (smex-completing-read commands)))
+  (if smex-custom-action
       (unwind-protect
-          (progn (setq prefix-arg current-prefix-arg)
-                 (command-execute smex-chosen 'record))
-        (smex-rank chosen)
-        (smex-show-key-advice chosen)))))
+          (funcall smex-custom-action smex-chosen)
+        (setq smex-custom-action nil))
+    (unwind-protect
+        (progn (setq prefix-arg current-prefix-arg)
+               (command-execute smex-chosen 'record))
+      (smex-rank smex-chosen)
+      (smex-show-key-advice smex-chosen)
+      ;; Todo: Is there a better way to manipulate 'last-repeatable-command'
+      ;; from the inside of an interactively called function?
+      (run-at-time 0.01 nil (lambda () (setq last-repeatable-command smex-chosen))))))
 
 (defun smex-major-mode-commands ()
   "Like `smex', but limited to commands that are relevant to the active major mode."
