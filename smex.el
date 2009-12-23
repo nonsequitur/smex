@@ -54,7 +54,8 @@ Must be set before initializing Smex."
             (funcall smex-custom-action chosen)
           (setq smex-custom-action nil))
       (unwind-protect
-          (call-interactively chosen)
+          (progn (setq prefix-arg current-prefix-arg)
+                 (command-execute smex-chosen 'record))
         (smex-rank chosen)
         (smex-show-key-advice chosen)))))
 
