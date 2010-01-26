@@ -51,7 +51,7 @@ no key bindings.
 
 ### Persistence
 Smex keeps a file to save its state betweens Emacs sessions. The
-default path is '~/smex.save'; you can change it by setting the
+default path is "~/.smex-items"; you can change it by setting the
 variable `smex-save-file`.
 
 ### Cache maintenance
