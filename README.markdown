@@ -18,7 +18,6 @@ commands. And to all the other commands, too.
    Bind some keys:
         (global-set-key (kbd "M-x") 'smex)
         (global-set-key (kbd "M-X") 'smex-major-mode-commands)
-        (global-set-key (kbd "C-c M-x") 'smex-update-and-run)
         ;; This is your old M-x.
         (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 
@@ -36,7 +35,7 @@ next/previous match. Enter executes the selected command.
 ## Learn more
 
 ### Show only major mode commands
-`smex-major-mode-commands` runs Smex, limited only to commands that
+`smex-major-mode-commands` runs Smex, limited to commands that
 are relevant to the active major mode. Try it with Dired or Magit.
 
 ### Command help
@@ -44,6 +43,18 @@ are relevant to the active major mode. Try it with Dired or Magit.
 currently selected command.
 
 `M-.` jumps to the definition of the selected command.
+
+### Accessing new commands
+Detecting new command definitions is slow.
+To guarantee snappiness, Smex' command caches aren't refreshed automatically.
+
+Call Smex a second time while it's already running to force it to
+update and to rebuild its suggestions; e.g. to access commands of a
+library you have just loaded.
+
+Additionally, you can teach Smex to update its caches after Emacs has
+been idle for 60 seconds: `(smex-auto-update)`. (Provide an integer
+argument for a custom time period in seconds.)
 
 ### Show unbound commands
 `smex-show-unbound-commands` shows frequently used commands that have
@@ -53,18 +64,6 @@ no key bindings.
 Smex keeps a file to save its state betweens Emacs sessions. The
 default path is "~/.smex-items"; you can change it by setting the
 variable `smex-save-file`.
-
-### Cache maintenance
-To guarantee snappiness, Smex maintains command caches - which,
-unfortunately, can not be automatically refreshed when new commands
-are defined (or unloaded).
-
-Run `smex-update-and-run` to update and invoke Smex, e.g. to access
-commands of a library you have just loaded.
-
-Additionally, you can teach Smex to update its caches after Emacs has
-been idle for 60 seconds: `(smex-auto-update)`. (Provide an integer
-argument for a custom time period in seconds.)
 
 ### History
 Set `smex-history-length` to change the number of recent commands that
