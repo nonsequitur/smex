@@ -44,14 +44,22 @@ Must be set before initializing Smex."
 ;;--------------------------------------------------------------------------------
 ;; Smex Interface
 
-(defun smex (&optional commands)
+(defun smex ()
   (interactive)
-  (unless commands (setq commands smex-ido-cache))
-  (let ((chosen-item (intern (smex-completing-read commands))))
+  (if (smex-already-running)
+      (smex-do-with-selected-item
+       (lambda (ignore) (smex-update) (smex-read-and-run smex-ido-cache ido-text)))
+    (smex-read-and-run smex-ido-cache)))
+
+(defsubst smex-already-running ()
+  (and (boundp 'ido-choice-list) (eql ido-choice-list smex-ido-cache)))
+
+(defun smex-read-and-run (commands &optional initial-input)
+  (let ((chosen-item (intern (smex-completing-read commands initial-input))))
     (if smex-custom-action
-        (unwind-protect
-            (funcall smex-custom-action chosen-item)
-          (setq smex-custom-action nil))
+        (let ((action smex-custom-action))
+          (setq smex-custom-action nil)
+          (funcall action chosen-item))
       (unwind-protect
           (progn (setq prefix-arg current-prefix-arg)
                  (command-execute chosen-item 'record))
@@ -69,15 +77,15 @@ Must be set before initializing Smex."
                          (extract-commands-from-features major-mode))))
     (setq commands (smex-sort-according-to-cache commands))
     (setq commands (mapcar (lambda (command) (symbol-name command)) commands))
-    (smex commands)))
+    (smex-read-and-run commands)))
 
-(defun smex-completing-read (choices)
+(defun smex-completing-read (choices initial-input)
   (let ((ido-completion-map ido-completion-map)
         (ido-setup-hook (cons 'smex-prepare-ido-bindings ido-setup-hook))
         (ido-enable-prefix nil)
         (ido-enable-flex-matching t)
         (ido-max-prospects 10))
-    (ido-completing-read smex-prompt-string choices)))
+    (ido-completing-read smex-prompt-string choices nil nil initial-input)))
 
 (defun smex-prepare-ido-bindings ()
   (define-key ido-completion-map (kbd "C-h f") 'smex-describe-function)
