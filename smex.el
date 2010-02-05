@@ -7,7 +7,7 @@
 ;; (smex-initialize)
 ;;
 ;; Bind the following commands:
-;; smex, smex-major-mode-commands, smex-update-and-run
+;; smex, smex-major-mode-commands
 ;;
 ;; For a detailed introduction see:
 ;; http://github.com/nonsequitur/smex/blob/master/README.markdown
@@ -137,11 +137,6 @@ Must be set before initializing Smex."
   (interactive)
   (smex-save-history)
   (smex-rebuild-cache))
-
-(defun smex-update-and-run ()
-  (interactive)
-  (smex-update)
-  (smex))
 
 (defun smex-auto-update (&optional idle-time)
   "Update Smex when Emacs has been idle for IDLE-TIME."
