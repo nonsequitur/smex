@@ -1,5 +1,5 @@
 ;;; smex.el --- A smart M-x enhancement for Emacs.
-;; (C) 2009 Cornelius Mika
+;; (C) 2009, 2010 Cornelius Mika
 ;; Licensed under the same terms as Emacs.
 
 ;;; Quick Start:
@@ -13,8 +13,15 @@
 ;; http://github.com/nonsequitur/smex/blob/master/README.markdown
 
 (require 'ido)
-;; Needed for `union'.
+;; Provides `union' and `dolist'.
 (require 'cl)
+
+(defgroup smex nil
+  "M-x interface with Ido-style lazy matching and ranking heuristics."
+  :group 'extensions
+  :group 'convenience
+  :version "1.0"
+  :link '(emacs-library-link :tag "Lisp File" "smex.el"))
 
 (defcustom smex-auto-update t
   "If non-nil, `Smex' checks for new commands each time it is run.
