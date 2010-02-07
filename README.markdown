@@ -45,16 +45,17 @@ currently selected command.
 `M-.` jumps to the definition of the selected command.
 
 ### Accessing new commands
-Detecting new command definitions is slow.
-To guarantee snappiness, Smex' command caches aren't refreshed automatically.
+Before accepting user input, Smex checks for new command definitions
+and updates its caches accordingly.
+You can disable auto-updating and gain some slight speed improvements
+on older systems by setting `smex-auto-update` to nil.
 
-Call Smex a second time while it's already running to force it to
-update and to rebuild its suggestions; e.g. to access commands of a
-library you have just loaded.
+To manually update Smex, call it a second time while it is already
+running.
 
-Additionally, you can teach Smex to update its caches after Emacs has
-been idle for 60 seconds: `(smex-auto-update)`. (Provide an integer
-argument for a custom time period in seconds.)
+Additionally, you can teach Smex to auto-update after Emacs has
+been idle for 60 seconds: Call `(smex-auto-update)`; provide an integer
+argument for a custom time period in seconds.
 
 ### Show unbound commands
 `smex-show-unbound-commands` shows frequently used commands that have

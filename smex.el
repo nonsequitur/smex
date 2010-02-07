@@ -16,6 +16,12 @@
 ;; Needed for `union'.
 (require 'cl)
 
+(defcustom smex-auto-update t
+  "If non-nil, `Smex' checks for new commands each time it is run.
+Turn it off for minor speed improvements on older systems."
+  :type 'boolean
+  :group 'smex)
+
 (defcustom smex-save-file "~/.smex-items"
   "File in which the smex state is saved between Emacs sessions.
 Variables stored are: `smex-data', `smex-history'.
@@ -39,6 +45,7 @@ Must be set before initializing Smex."
 (defvar smex-ido-cache)
 (defvar smex-data)
 (defvar smex-history)
+(defvar smex-command-count 0)
 (defvar smex-custom-action nil)
 
 ;;--------------------------------------------------------------------------------
@@ -49,6 +56,7 @@ Must be set before initializing Smex."
   (if (smex-already-running)
       (smex-do-with-selected-item
        (lambda (ignore) (smex-update) (smex-read-and-run smex-ido-cache ido-text)))
+    (and smex-auto-update (smex-detect-new-commands) (smex-update))
     (smex-read-and-run smex-ido-cache)))
 
 (defsubst smex-already-running ()
@@ -138,10 +146,17 @@ Must be set before initializing Smex."
   (smex-save-history)
   (smex-rebuild-cache))
 
+(defun smex-detect-new-commands ()
+  (let ((i 0))
+    (mapatoms (lambda (symbol) (if (commandp symbol) (setq i (1+ i)))))
+    (unless (= i smex-command-count)
+      (setq smex-command-count i))))
+
 (defun smex-auto-update (&optional idle-time)
   "Update Smex when Emacs has been idle for IDLE-TIME."
   (unless idle-time (setq idle-time 60))
-  (run-with-idle-timer idle-time t 'smex-update))
+  (run-with-idle-timer idle-time t
+                       '(lambda () (if (smex-detect-new-commands) (smex-update)))))
 
 (defun smex-detect-legacy-save-file ()
   "The default value of `smex-save-file' was changed in between releases.
@@ -164,6 +179,7 @@ This function provides temporary means to aid the transition."
           (setq smex-history (read (current-buffer))
                 smex-data (read (current-buffer))))
       (setq smex-history nil smex-data nil))
+    (smex-detect-new-commands)
     (smex-rebuild-cache)
     (add-hook 'kill-emacs-hook 'smex-save-to-file)))
 
