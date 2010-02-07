@@ -208,7 +208,7 @@ This function provides temporary means to aid the transition."
                           (progn (smex-update)
                                  (assq command smex-cache)))))
     (when command-item
-      (smex-update-count command-item)
+      (smex-update-counter command-item)
 
       ;; Don't touch the cache order if the chosen command
       ;; has just been execucted previously.
@@ -230,7 +230,7 @@ This function provides temporary means to aid the transition."
           ;; Now put the last history item back to its normal place.
           (smex-sort-item-at smex-history-length))))))
 
-(defun smex-update-count (command-item)
+(defun smex-update-counter (command-item)
   (let ((count (cdr command-item)))
     (setcdr command-item
             (if count
