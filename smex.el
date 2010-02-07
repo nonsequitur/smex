@@ -4,7 +4,6 @@
 
 ;;; Quick Start:
 ;; (require 'smex)
-;; Run this after all your other Emacs packages have been loaded:
 ;; (smex-initialize)
 ;;
 ;; Bind the following commands:
