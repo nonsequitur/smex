@@ -88,7 +88,7 @@ Must be set before initializing Smex."
 (defun smex-major-mode-commands ()
   "Like `smex', but limited to commands that are relevant to the active major mode."
   (interactive)
-  (let ((commands (union (extract-commands-from-keymap major-mode)
+  (let ((commands (union (extract-commands-from-keymap (current-local-map))
                          (extract-commands-from-features major-mode))))
     (setq commands (smex-sort-according-to-cache commands))
     (setq commands (mapcar (lambda (command) (symbol-name command)) commands))
@@ -361,19 +361,19 @@ Returns nil when reaching the end of the list."
   (let (message-log-max)
     (message "%s" string)))
 
-(defun extract-commands-from-keymap (mode)
-  (let ((keymap (intern (concat (symbol-name mode) "-map"))))
-    (if keymap
-        (parse-keymap (symbol-value keymap)))))
+(defun extract-commands-from-keymap (map)
+  (let (commands)
+    (parse-keymap map)
+    commands))
 
 (defun parse-keymap (map)
-  (let (commands)
-    (map-keymap (lambda (binding element)
-                  (if (listp element)
-                      (if (eq 'keymap (car element))
-                          (parse-keymap element))
-                    (setq commands (cons element commands)))) map)
-    commands))
+  (map-keymap (lambda (binding element)
+                (if (and (listp element) (eq 'keymap (car element)))
+                    (parse-keymap element)
+                          ; Strings are commands, too. Reject them.
+                  (if (and (symbolp element) (commandp element))
+                      (setq commands (cons element commands)))))
+              map))
 
 (defun extract-commands-from-features (mode)
   (let ((library-path (symbol-file mode))
