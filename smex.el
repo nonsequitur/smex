@@ -382,6 +382,7 @@ Returns nil when reaching the end of the list."
     (string-match "\\(.+?\\)\\(-mode\\)?$" mode-name)
     ;; 'lisp-mode' -> 'lisp'
     (setq mode-name (match-string 1 mode-name))
+    (if (string= mode-name "c") (setq mode-name "cc"))
     (dolist (feature load-history)
       (let ((feature-path (car feature)))
         (when (and feature-path (or (equal feature-path library-path)
