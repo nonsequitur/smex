@@ -187,6 +187,7 @@ This function provides temporary means to aid the transition."
                          smex-save-file legacy-save-file))
         (setq smex-save-file legacy-save-file)))))
 
+;;;###autoload
 (defun smex-initialize ()
   (interactive)
   (unless ido-mode (smex-initialize-ido))
