@@ -1,10 +1,22 @@
-;;; smex.el --- A smart M-x enhancement for Emacs.
-;; (C) 2009, 2010 Cornelius Mika
+;;; smex.el --- M-x interface with Ido-style lazy matching.
+
+;; Copyright (C) 2009, 2010 Cornelius Mika
+;;
+;; Author: Cornelius Mika <cornelius.mika@gmail.com>
+;; URL: http://github.com/nonsequitur/smex/
+;; Version: 1.1
+;; Keywords: convenience, usability
+
+;; This file is not part of GNU Emacs.
+
+;;; License:
+
 ;; Licensed under the same terms as Emacs.
 
-;;; Quick Start:
-;; (require 'smex)
-;; (smex-initialize)
+;;; Commentary:
+
+;; Quick start:
+;; run (smex-initialize)
 ;;
 ;; Bind the following commands:
 ;; smex, smex-major-mode-commands
@@ -424,3 +436,4 @@ sorted by frequency of use."
     (beginning-of-buffer)))
 
 (provide 'smex)
+;;; smex.el ends here
