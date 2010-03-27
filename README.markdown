@@ -8,13 +8,13 @@ commands. And to all the other commands, too.
 
 ## Get started
 
-* Download Smex.
-
-* Add Smex to your load path. [(Find out more.)](http://www.emacswiki.org/emacs/InstallingPackages)
+* Get Smex
+   * Via [(ELPA)](http://tromey.com/elpa/upload.html).
+   * Or manually download Smex and set-up your load path. [(Find out more.)](http://www.emacswiki.org/emacs/InstallingPackages)
 
 * To auto-start Smex every time you open Emacs add these lines to your .emacs file:
         (require 'smex)
-        (add-hook 'after-init-hook 'smex-initialize)
+        (smex-initialize)
    Bind some keys:
         (global-set-key (kbd "M-x") 'smex)
         (global-set-key (kbd "M-X") 'smex-major-mode-commands)
