@@ -9,7 +9,7 @@ commands. And to all the other commands, too.
 ## Get started
 
 * Get Smex
-   * Via [(ELPA)](http://tromey.com/elpa/upload.html).
+   * Via [ELPA](http://tromey.com/elpa/upload.html).
    * Or manually download Smex and set-up your load path. [(Find out more.)](http://www.emacswiki.org/emacs/InstallingPackages)
 
 * To auto-start Smex every time you open Emacs add these lines to your .emacs file:
