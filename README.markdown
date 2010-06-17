@@ -6,6 +6,8 @@ Smex is a M-x enhancement for Emacs. Built on top of Ido, it provides
 a convenient interface to your recently and most frequently used
 commands. And to all the other commands, too.
 
+![Smex](http://sites.google.com/site/cumulatm/home/SmexScreenshotImage.png)
+
 ## Get started
 
 * Get Smex
