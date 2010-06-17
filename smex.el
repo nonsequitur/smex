@@ -1,4 +1,4 @@
-;;; smex.el --- M-x interface with Ido-style lazy matching.
+;;; smex.el --- M-x interface with Ido-style fuzzy matching.
 
 ;; Copyright (C) 2009, 2010 Cornelius Mika
 ;;
@@ -29,7 +29,7 @@
 (require 'cl)
 
 (defgroup smex nil
-  "M-x interface with Ido-style lazy matching and ranking heuristics."
+  "M-x interface with Ido-style fuzzy matching and ranking heuristics."
   :group 'extensions
   :group 'convenience
   :version "1.1"
