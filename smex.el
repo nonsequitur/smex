@@ -70,19 +70,19 @@ Must be set before initializing Smex."
 ;;--------------------------------------------------------------------------------
 ;; Smex Interface
 
-(defun smex ()
-  (interactive)
+(defun smex (prefixarg)
+  (interactive "P")
   (if (smex-already-running)
       (smex-do-with-selected-item
-       (lambda (ignore) (smex-update) (smex-read-and-run smex-ido-cache ido-text)))
+       (lambda (ignore) (smex-update) (smex-read-and-run prefixarg smex-ido-cache ido-text)))
     (and smex-auto-update (smex-detect-new-commands) (smex-update))
-    (smex-read-and-run smex-ido-cache)))
+    (smex-read-and-run prefixarg smex-ido-cache)))
 
 (defsubst smex-already-running ()
   (and (boundp 'ido-choice-list) (eql ido-choice-list smex-ido-cache)))
 
-(defun smex-read-and-run (commands &optional initial-input)
-  (let ((chosen-item (intern (smex-completing-read commands initial-input))))
+(defun smex-read-and-run (prefixarg commands &optional initial-input)
+  (let ((chosen-item (intern (smex-completing-read prefixarg commands initial-input))))
     (if smex-custom-action
         (let ((action smex-custom-action))
           (setq smex-custom-action nil)
@@ -97,22 +97,36 @@ Must be set before initializing Smex."
         (run-at-time 0.01 nil (lambda (cmd) (setq last-repeatable-command cmd))
                      chosen-item)))))
 
-(defun smex-major-mode-commands ()
+(defun smex-major-mode-commands (prefixarg)
   "Like `smex', but limited to commands that are relevant to the active major mode."
-  (interactive)
+  (interactive "P")
   (let ((commands (union (extract-commands-from-keymap (current-local-map))
                          (extract-commands-from-features major-mode))))
     (setq commands (smex-sort-according-to-cache commands))
     (setq commands (mapcar (lambda (command) (symbol-name command)) commands))
-    (smex-read-and-run commands)))
+    (smex-read-and-run prefixarg commands)))
 
-(defun smex-completing-read (choices initial-input)
+(defun smex-completing-read (prefixarg choices initial-input)
   (let ((ido-completion-map ido-completion-map)
         (ido-setup-hook (cons 'smex-prepare-ido-bindings ido-setup-hook))
         (ido-enable-prefix nil)
         (ido-enable-flex-matching t)
         (ido-max-prospects 10))
-    (ido-completing-read smex-prompt-string choices nil nil initial-input)))
+    (ido-completing-read
+      (concat
+        (cond ((eq prefixarg '-)
+               "- ")
+              ((and (consp prefixarg)
+                    (= (car prefixarg) 4))
+               "C-u ")
+              ((and (consp prefixarg)
+                    (integerp (car prefixarg)))
+               (format "%d " (car prefixarg)))
+              ((integerp prefixarg)
+               (format "%d " prefixarg))
+              (t ""))
+        smex-prompt-string)
+      choices nil nil initial-input)))
 
 (defun smex-prepare-ido-bindings ()
   (define-key ido-completion-map (kbd "C-h f") 'smex-describe-function)
