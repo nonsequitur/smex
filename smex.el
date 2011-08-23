@@ -488,5 +488,24 @@ sorted by frequency of use."
     (set-buffer-modified-p nil)
     (goto-char (point-min))))
 
+(defmacro update-smex-after (&rest functions)
+  "Advise each of FUNCTIONS to execute smex-update upon completion."
+  (cons
+   'progn
+   (mapcar (lambda (fun)
+             ;; Running this on `eval' causes an infinite loop, so
+             ;; don't do that.
+             (when (not (eq fun 'eval))
+               `(defadvice ,fun (after smex-update activate)
+                  "Run smex-update upon completion"
+                  (when (boundp 'smex-cache)
+                    (smex-update)))))
+           (mapcar 'eval
+                   functions))))
+
+;; If you just update smex after these functions, 
+;; you pretty much never need manual periodic updates.
+(update-smex-after 'load 'eval-last-sexp 'eval-buffer)
+
 (provide 'smex)
 ;;; smex.el ends here
