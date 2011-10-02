@@ -78,6 +78,9 @@ Smex keeps track of.
 ### Prompt
 Set `smex-prompt-string` for a custom prompt.
 
+### Ignore menu bar bindings
+Enable `smex-key-advice-ignore-menu-bar` to ignore clues to menu bar bindings.
+
 ## Appendix
 
 Smex is my first venture into Elisp. I'd be glad to receive patches,

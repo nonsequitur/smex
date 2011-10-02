@@ -25,7 +25,7 @@
 ;; http://github.com/nonsequitur/smex/blob/master/README.markdown
 
 (require 'ido)
-;; Provides `union' and `dolist'.
+;; Provides `union', `dolist' and `delete-if'.
 (require 'cl)
 
 (defgroup smex nil
@@ -58,6 +58,11 @@ Must be set before initializing Smex."
 (defcustom smex-prompt-string "M-x "
   "String to display in the Smex prompt."
   :type 'string
+  :group 'smex)
+
+(defcustom smex-key-advice-ignore-menu-bar nil
+  "If non-nil, `smex-key-advice' ignores `menu-bar' bindings"
+  :type 'boolean
   :group 'smex)
 
 (defvar smex-cache)
@@ -364,6 +369,10 @@ Returns nil when reaching the end of the list."
 
 (defun smex-key-advice (command)
   (let ((keys (where-is-internal command)))
+    (if smex-key-advice-ignore-menu-bar
+        (setq keys (delete-if
+                    (lambda (vect) (equal (aref vect 0) 'menu-bar))
+                    keys)))
     (if keys
         (format "You can run the command `%s' with %s"
                 command
