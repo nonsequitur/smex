@@ -434,7 +434,7 @@ sorted by frequency of use."
     (toggle-read-only nil)
     (erase-buffer)
     (ido-pp 'unbound-commands)
-    (beginning-of-buffer)))
+    (goto-char (point-min))))
 
 (provide 'smex)
 ;;; smex.el ends here
