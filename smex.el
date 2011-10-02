@@ -117,7 +117,20 @@ Must be set before initializing Smex."
         (ido-enable-prefix nil)
         (ido-enable-flex-matching t)
         (ido-max-prospects 10))
-    (ido-completing-read smex-prompt-string choices nil nil initial-input)))
+    (ido-completing-read (smex-prompt-with-prefix-arg) choices nil nil initial-input)))
+
+(defun smex-prompt-with-prefix-arg ()
+  (if (not current-prefix-arg)
+      smex-prompt-string
+    (concat
+     (if (eq current-prefix-arg '-)
+         "- "
+       (if (integerp current-prefix-arg)
+           (format "%d " current-prefix-arg)
+         (if (= (car current-prefix-arg) 4)
+             "C-u "
+           (format "%d " (car current-prefix-arg)))))
+     smex-prompt-string)))
 
 (defun smex-prepare-ido-bindings ()
   (define-key ido-completion-map (kbd "C-h f") 'smex-describe-function)
