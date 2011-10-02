@@ -26,7 +26,7 @@
 
 (require 'ido)
 ;; Provides `union' and `dolist'.
-(eval-when-compile (require 'cl))
+(require 'cl)
 
 (defgroup smex nil
   "M-x interface with Ido-style fuzzy matching and ranking heuristics."
