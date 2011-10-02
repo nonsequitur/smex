@@ -89,9 +89,7 @@ Set this to nil to disable fuzzy matching."
     (smex-initialize))
   (if (smex-already-running)
       (smex-update-and-rerun)
-    (and smex-auto-update
-         (smex-detect-new-commands)
-         (smex-update))
+    (and smex-auto-update (smex-update-if-needed))
     (smex-read-and-run smex-ido-cache)))
 
 (defsubst smex-already-running ()
@@ -217,11 +215,13 @@ Set this to nil to disable fuzzy matching."
     (unless (= i smex-command-count)
       (setq smex-command-count i))))
 
+(defun smex-update-if-needed ()
+  (if (smex-detect-new-commands) (smex-update)))
+
 (defun smex-auto-update (&optional idle-time)
   "Update Smex when Emacs has been idle for IDLE-TIME."
   (unless idle-time (setq idle-time 60))
-  (run-with-idle-timer idle-time t
-                       '(lambda () (if (smex-detect-new-commands) (smex-update)))))
+  (run-with-idle-timer idle-time t 'smex-update-if-needed))
 
 (defun smex-detect-legacy-save-file ()
   "The default value of `smex-save-file' was changed in between releases.
@@ -488,24 +488,23 @@ sorted by frequency of use."
     (set-buffer-modified-p nil)
     (goto-char (point-min))))
 
-(defmacro update-smex-after (&rest functions)
+(defmacro smex-auto-update-after (&rest functions)
   "Advise each of FUNCTIONS to execute smex-update upon completion."
   (cons
    'progn
    (mapcar (lambda (fun)
-             ;; Running this on `eval' causes an infinite loop, so
-             ;; don't do that.
-             (when (not (eq fun 'eval))
-               `(defadvice ,fun (after smex-update activate)
-                  "Run smex-update upon completion"
-                  (when (boundp 'smex-cache)
-                    (smex-update)))))
-           (mapcar 'eval
-                   functions))))
+             `(defadvice ,fun (after smex-update activate)
+                "Run smex-update upon completion"
+                (when (bound-and-true-p 'smex-auto-update)
+                  (smex-update-if-needed))))
+           ;; Defining advice on `eval' causes infinite recursion, so
+           ;; don't allow that.
+           (delete-if (apply-partially 'equal 'eval)
+                      functions))))
 
-;; If you just update smex after these functions, 
-;; you pretty much never need manual periodic updates.
-(update-smex-after 'load 'eval-last-sexp 'eval-buffer)
+;; If you call `smex-update' after every invocation of just these few
+;; functions, you almost never need any other updates.
+(smex-auto-update-after load eval-last-sexp eval-buffer)
 
 (provide 'smex)
 ;;; smex.el ends here
