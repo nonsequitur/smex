@@ -78,13 +78,17 @@ Must be set before initializing Smex."
 (defun smex ()
   (interactive)
   (if (smex-already-running)
-      (smex-do-with-selected-item
-       (lambda (ignore) (smex-update) (smex-read-and-run smex-ido-cache ido-text)))
-    (and smex-auto-update (smex-detect-new-commands) (smex-update))
+      (smex-update-and-rerun)
+    (and smex-auto-update (smex-detect-new-commands)
+         (smex-update))
     (smex-read-and-run smex-ido-cache)))
 
 (defsubst smex-already-running ()
   (and (boundp 'ido-choice-list) (eql ido-choice-list smex-ido-cache)))
+
+(defsubst smex-update-and-rerun ()
+  (smex-do-with-selected-item
+   (lambda (ignore) (smex-update) (smex-read-and-run smex-ido-cache ido-text))))
 
 (defun smex-read-and-run (commands &optional initial-input)
   (let ((chosen-item (intern (smex-completing-read commands initial-input))))
