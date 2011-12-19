@@ -183,6 +183,7 @@ Must be set before initializing Smex."
         (reverse smex-history)))
 
 (defun smex-sort-according-to-cache (list)
+  "Sorts a list of commands by their order in `smex-cache'"
   (let (sorted)
     (dolist (command-item smex-cache)
       (let ((command (car command-item)))
