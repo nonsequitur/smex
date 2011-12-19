@@ -182,6 +182,15 @@ Must be set before initializing Smex."
                   (setq smex-cache command-cell))))))
         (reverse smex-history)))
 
+(defun smex-sort-according-to-cache (list)
+  (let (sorted)
+    (dolist (command-item smex-cache)
+      (let ((command (car command-item)))
+        (when (memq command list)
+          (setq sorted (cons command sorted))
+          (setq list (delq command list)))))
+    (nreverse (append list sorted))))
+
 (defun smex-update ()
   (interactive)
   (smex-save-history)
@@ -436,15 +445,6 @@ Returns nil when reaching the end of the list."
                   (when (commandp function)
                     (setq commands (append commands (list function))))))))))
     commands))
-
-(defun smex-sort-according-to-cache (list)
-  (let (sorted)
-    (dolist (command-item smex-cache)
-      (let ((command (car command-item)))
-        (when (memq command list)
-          (setq sorted (cons command sorted))
-          (setq list (delq command list)))))
-    (nreverse (append list sorted))))
 
 (defun smex-show-unbound-commands ()
   "Shows unbound commands in a new buffer,
