@@ -35,7 +35,7 @@ order.
 
 Ido completion in 10 seconds: Typing selects matching commands:
 e.g. 'lnmd' matches 'line-number-mode'. `C-s`/`C-r` switches to the
-next/previous match. Enter executes the selected command.
+next/previous match. `Enter` executes the selected command.
 
 ## Learn more
 
