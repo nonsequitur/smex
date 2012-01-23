@@ -495,8 +495,9 @@ sorted by frequency of use."
    (mapcar (lambda (fun)
              `(defadvice ,fun (after smex-update activate)
                 "Run smex-update upon completion"
-                (when (bound-and-true-p 'smex-auto-update)
-                  (smex-update-if-needed))))
+                (ignore-errors
+                  (when (bound-and-true-p smex-auto-update)
+                    (smex-update-if-needed)))))
            ;; Defining advice on `eval' causes infinite recursion, so
            ;; don't allow that.
            (delete-if (apply-partially 'equal 'eval)
