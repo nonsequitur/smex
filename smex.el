@@ -504,7 +504,7 @@ sorted by frequency of use."
 
 ;; If you call `smex-update' after every invocation of just these few
 ;; functions, you almost never need any other updates.
-(smex-auto-update-after load eval-last-sexp eval-buffer)
+(smex-auto-update-after load eval-last-sexp eval-buffer eval-region)
 
 (provide 'smex)
 ;;; smex.el ends here
