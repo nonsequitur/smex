@@ -24,6 +24,8 @@
 ;; For a detailed introduction see:
 ;; http://github.com/nonsequitur/smex/blob/master/README.markdown
 
+;;; Code:
+
 (require 'ido)
 ;; Provides `union', `dolist' and `delete-if'.
 (require 'cl)
