@@ -67,6 +67,12 @@ Must be set before initializing Smex."
   :type 'boolean
   :group 'smex)
 
+(defcustom smex-flex-matching t
+  "Enables Ido flex matching. On by default.
+Set this to nil to disable fuzzy matching."
+  :type 'boolean
+  :group 'smex)
+
 (defvar smex-cache)
 (defvar smex-ido-cache)
 (defvar smex-data)
@@ -121,7 +127,7 @@ Must be set before initializing Smex."
   (let ((ido-completion-map ido-completion-map)
         (ido-setup-hook (cons 'smex-prepare-ido-bindings ido-setup-hook))
         (ido-enable-prefix nil)
-        (ido-enable-flex-matching t)
+        (ido-enable-flex-matching smex-flex-matching)
         (ido-max-prospects 10))
     (ido-completing-read (smex-prompt-with-prefix-arg) choices nil nil initial-input)))
 
