@@ -15,11 +15,12 @@
 
 ;;; Commentary:
 
-;; Quick start:
-;; run (smex-initialize)
+;; Smex is a global minor mode which replaces `execute-extended-command' with
+;; `smex', which uses `ido-mode' to provide enhanced completion.
 ;;
-;; Bind the following commands:
-;; smex, smex-major-mode-commands
+;; To enable, set the custom variable `smex-mode' to a non-nil value.
+;;
+;; Smex can also be enabled manually by executing the function `smex-mode'.
 ;;
 ;; For a detailed introduction see:
 ;; http://github.com/nonsequitur/smex/blob/master/README.markdown
@@ -35,10 +36,11 @@
   :group 'extensions
   :group 'convenience
   :version "1.1"
+  :prefix "smex-"
   :link '(emacs-library-link :tag "Lisp File" "smex.el"))
 
 (defcustom smex-auto-update t
-  "If non-nil, `Smex' checks for new commands each time it is run.
+  "If non-nil, `smex' checks for new commands each time it is run.
 Turn it off for minor speed improvements on older systems."
   :type 'boolean
   :group 'smex)
@@ -47,7 +49,7 @@ Turn it off for minor speed improvements on older systems."
   "File in which the smex state is saved between Emacs sessions.
 Variables stored are: `smex-data', `smex-history'.
 Must be set before initializing Smex."
-  :type 'string
+  :type 'file
   :group 'smex)
 
 (defcustom smex-history-length 7
@@ -83,7 +85,41 @@ Set this to nil to disable fuzzy matching."
 ;;--------------------------------------------------------------------------------
 ;; Smex Interface
 
+;;;###autoload
+(define-minor-mode smex-mode "Minor mode to supercharge M-x.
+When `smex-mode' is active, `execute-extended-command' is
+remapped to `smex'. Built on top of Ido, it provides a convenient
+interface to your recently and most frequently used commands. And
+to all the other commands, too.
+
+No longer supports legacy save files; if you are still using the
+old-style save file (\"~/smex.save\"), you will need to copy it
+to the location in `smex-save-file'.
+
+Setting this variable directly does not take effect; use either
+\\[customize] or the function `smex-mode'."
+  :group 'smex
+  :global t
+  :require 'smex
+  :keymap '(([remap execute-extended-command] . smex)
+            ([M-X] . smex-major-mode-commands))
+  (if smex-mode
+      (progn
+        (unless ido-mode (ido-common-initialization))
+        (let ((save-file (expand-file-name smex-save-file)))
+          (if (file-readable-p save-file)
+              (with-temp-buffer
+                (insert-file-contents save-file)
+                (setq smex-history (read (current-buffer))
+                      smex-data (read (current-buffer))))
+            (setq smex-history nil
+                  smex-data nil))
+          (smex-detect-new-commands)
+          (smex-rebuild-cache)
+          (add-hook 'kill-emacs-hook 'smex-save-to-file)))))
+
 (defun smex ()
+  "Read a function name using ido-enhanced search and call it."
   (interactive)
   (if (smex-already-running)
       (smex-update-and-rerun)
@@ -436,13 +472,13 @@ Returns nil when reaching the end of the list."
   (let ((library-path (symbol-file mode))
         (mode-name (symbol-name mode))
         commands)
-    
+
     (string-match "\\(.+?\\)\\(-mode\\)?$" mode-name)
     ;; 'lisp-mode' -> 'lisp'
     (setq mode-name (match-string 1 mode-name))
     (if (string= mode-name "c") (setq mode-name "cc"))
     (setq mode-name (regexp-quote mode-name))
-    
+
     (dolist (feature load-history)
       (let ((feature-path (car feature)))
         (when (and feature-path (or (equal feature-path library-path)
