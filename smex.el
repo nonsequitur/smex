@@ -27,8 +27,6 @@
 ;;; Code:
 
 (require 'ido)
-;; Provides `union', `dolist' and `delete-if'.
-(require 'cl)
 
 (defgroup smex nil
   "M-x interface with Ido-style fuzzy matching and ranking heuristics."
@@ -119,8 +117,8 @@ Set this to nil to disable fuzzy matching."
 (defun smex-major-mode-commands ()
   "Like `smex', but limited to commands that are relevant to the active major mode."
   (interactive)
-  (let ((commands (union (extract-commands-from-keymap (current-local-map))
-                         (extract-commands-from-features major-mode))))
+  (let ((commands (delete-dups (append (extract-commands-from-keymap (current-local-map))
+                                       (extract-commands-from-features major-mode)))))
     (setq commands (smex-sort-according-to-cache commands))
     (setq commands (mapcar #'symbol-name commands))
     (smex-read-and-run commands)))
@@ -405,11 +403,11 @@ Returns nil when reaching the end of the list."
         (smex-unlogged-message advice)))))
 
 (defun smex-key-advice (command)
-  (let ((keys (where-is-internal command)))
-    (if smex-key-advice-ignore-menu-bar
-        (setq keys (delete-if
-                    (lambda (vect) (equal (aref vect 0) 'menu-bar))
-                    keys)))
+  (let (keys)
+    (mapc #'(lambda (vec) (unless (and smex-key-advice-ignore-menu-bar
+                                       (equal (aref vec 0) 'menu-bar))
+                            (add-to-list 'keys vec)))
+          (where-is-internal command))
     (if keys
         (format "You can run the command `%s' with %s"
                 command
