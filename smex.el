@@ -102,7 +102,7 @@ Setting this variable directly does not take effect; use either
   :global t
   :require 'smex
   :keymap '(([remap execute-extended-command] . smex)
-            ([M-X] . smex-major-mode-commands))
+            ([?\M-X] . smex-major-mode-commands))
   (if smex-mode
       (progn
         (unless ido-mode (ido-common-initialization))
