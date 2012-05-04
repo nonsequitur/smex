@@ -120,7 +120,7 @@ Set this to nil to disable fuzzy matching."
   (let ((commands (union (extract-commands-from-keymap (current-local-map))
                          (extract-commands-from-features major-mode))))
     (setq commands (smex-sort-according-to-cache commands))
-    (setq commands (mapcar (lambda (command) (symbol-name command)) commands))
+    (setq commands (mapcar #'symbol-name commands))
     (smex-read-and-run commands)))
 
 (defun smex-completing-read (choices initial-input)
