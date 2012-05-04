@@ -11,7 +11,20 @@
 
 ;;; License:
 
-;; Licensed under the same terms as Emacs.
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 2, or (at your option)
+;; any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program; if not, write to the Free Software
+;; Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -27,8 +40,6 @@
 ;;; Code:
 
 (require 'ido)
-;; Provides `union', `dolist' and `delete-if'.
-(require 'cl)
 
 (defgroup smex nil
   "M-x interface with Ido-style fuzzy matching and ranking heuristics."
@@ -83,6 +94,15 @@ Set this to nil to disable fuzzy matching."
 ;;--------------------------------------------------------------------------------
 ;; Smex Interface
 
+(defsubst smex-already-running ()
+  (and (boundp 'ido-choice-list) (eql ido-choice-list smex-ido-cache)))
+
+(defsubst smex-update-and-rerun ()
+  (smex-do-with-selected-item
+   (lambda (ignore) (smex-update) (smex-read-and-run smex-ido-cache ido-text))))
+
+
+
 (defun smex ()
   (interactive)
   (if (smex-already-running)
@@ -90,13 +110,6 @@ Set this to nil to disable fuzzy matching."
     (and smex-auto-update (smex-detect-new-commands)
          (smex-update))
     (smex-read-and-run smex-ido-cache)))
-
-(defsubst smex-already-running ()
-  (and (boundp 'ido-choice-list) (eql ido-choice-list smex-ido-cache)))
-
-(defsubst smex-update-and-rerun ()
-  (smex-do-with-selected-item
-   (lambda (ignore) (smex-update) (smex-read-and-run smex-ido-cache ido-text))))
 
 (defun smex-read-and-run (commands &optional initial-input)
   (let ((chosen-item (intern (smex-completing-read commands initial-input))))
@@ -117,10 +130,10 @@ Set this to nil to disable fuzzy matching."
 (defun smex-major-mode-commands ()
   "Like `smex', but limited to commands that are relevant to the active major mode."
   (interactive)
-  (let ((commands (union (extract-commands-from-keymap (current-local-map))
-                         (extract-commands-from-features major-mode))))
+  (let ((commands (delete-dups (append (extract-commands-from-keymap (current-local-map))
+                                       (extract-commands-from-features major-mode)))))
     (setq commands (smex-sort-according-to-cache commands))
-    (setq commands (mapcar (lambda (command) (symbol-name command)) commands))
+    (setq commands (mapcar #'symbol-name commands))
     (smex-read-and-run commands)))
 
 (defun smex-completing-read (choices initial-input)
@@ -403,11 +416,11 @@ Returns nil when reaching the end of the list."
         (smex-unlogged-message advice)))))
 
 (defun smex-key-advice (command)
-  (let ((keys (where-is-internal command)))
-    (if smex-key-advice-ignore-menu-bar
-        (setq keys (delete-if
-                    (lambda (vect) (equal (aref vect 0) 'menu-bar))
-                    keys)))
+  (let (keys)
+    (mapc #'(lambda (vec) (unless (and smex-key-advice-ignore-menu-bar
+                                       (equal (aref vec 0) 'menu-bar))
+                            (add-to-list 'keys vec)))
+          (where-is-internal command))
     (if keys
         (format "You can run the command `%s' with %s"
                 command
@@ -466,9 +479,11 @@ sorted by frequency of use."
                                             command-item))
                                         smex-data))))
     (view-buffer-other-window "*Smex: Unbound Commands*")
-    (toggle-read-only nil)
-    (erase-buffer)
-    (ido-pp 'unbound-commands)
+    (setq buffer-read-only t)
+    (let ((inhibit-read-only t))
+      (erase-buffer)
+      (ido-pp 'unbound-commands))
+    (set-buffer-modified-p nil)
     (goto-char (point-min))))
 
 (provide 'smex)
