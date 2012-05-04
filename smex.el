@@ -109,7 +109,9 @@ to the location in `smex-save-file'."
                   smex-data nil))
           (smex-detect-new-commands)
           (smex-rebuild-cache)
-          (add-hook 'kill-emacs-hook 'smex-save-to-file)))))
+          (add-hook 'kill-emacs-hook 'smex-save-to-file))))
+  (smex-save-to-file)
+  (remove-hook 'kill-emacs-hook 'smex-save-to-file))
 
 (defun smex ()
   "Read a function name using ido-enhanced search and call it."
