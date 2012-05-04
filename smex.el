@@ -47,15 +47,12 @@ Turn it off for minor speed improvements on older systems."
 
 (defcustom smex-save-file "~/.smex-items"
   "File in which the smex state is saved between Emacs sessions.
-Variables stored are: `smex-data', `smex-history'.
-Must be set before initializing Smex."
+Variables stored are: `smex-data', `smex-history'."
   :type 'file
   :group 'smex)
 
 (defcustom smex-history-length 7
-  "Determines on how many recently executed commands
-Smex should keep a record.
-Must be set before initializing Smex."
+  "Number of recently executed commands Smex records."
   :type 'integer
   :group 'smex)
 
@@ -65,13 +62,12 @@ Must be set before initializing Smex."
   :group 'smex)
 
 (defcustom smex-key-advice-ignore-menu-bar nil
-  "If non-nil, `smex-key-advice' ignores `menu-bar' bindings"
+  "If non-nil, `smex-key-advice' ignores `menu-bar' bindings."
   :type 'boolean
   :group 'smex)
 
 (defcustom smex-flex-matching t
-  "Enables Ido flex matching. On by default.
-Set this to nil to disable fuzzy matching."
+  "Non-nil means enable Ido flex matching."
   :type 'boolean
   :group 'smex)
 
@@ -94,10 +90,7 @@ to all the other commands, too.
 
 No longer supports legacy save files; if you are still using the
 old-style save file (\"~/smex.save\"), you will need to copy it
-to the location in `smex-save-file'.
-
-Setting this variable directly does not take effect; use either
-\\[customize] or the function `smex-mode'."
+to the location in `smex-save-file'."
   :group 'smex
   :global t
   :require 'smex
