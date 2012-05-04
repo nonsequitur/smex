@@ -256,27 +256,6 @@ This function provides temporary means to aid the transition."
                          smex-save-file legacy-save-file))
         (setq smex-save-file legacy-save-file)))))
 
-;;;###autoload
-(defun smex-initialize ()
-  (interactive)
-  (unless ido-mode (smex-initialize-ido))
-  (smex-detect-legacy-save-file)
-  (let ((save-file (expand-file-name smex-save-file)))
-    (if (file-readable-p save-file)
-        (with-temp-buffer
-          (insert-file-contents save-file)
-          (setq smex-history (read (current-buffer))
-                smex-data (read (current-buffer))))
-      (setq smex-history nil smex-data nil))
-    (smex-detect-new-commands)
-    (smex-rebuild-cache)
-    (add-hook 'kill-emacs-hook 'smex-save-to-file)))
-
-(defun smex-initialize-ido ()
-  "Sets up a minimal Ido environment for `ido-completing-read'."
-  (ido-init-completion-maps)
-  (add-hook 'minibuffer-setup-hook 'ido-minibuffer-setup))
-
 (defun smex-save-history ()
   "Updates `smex-history'"
   (setq smex-history nil)
