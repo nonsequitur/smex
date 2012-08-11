@@ -85,7 +85,8 @@ Set this to nil to disable fuzzy matching."
   (interactive)
   (if (smex-already-running)
       (smex-update-and-rerun)
-    (and smex-auto-update (smex-detect-new-commands)
+    (and smex-auto-update
+         (smex-detect-new-commands)
          (smex-update))
     (smex-read-and-run smex-ido-cache)))
 
