@@ -405,13 +405,17 @@ Returns nil when reaching the end of the list."
 (defun smex-key-advice (command)
   (let ((keys (where-is-internal command)))
     (if smex-key-advice-ignore-menu-bar
-        (setq keys (delete-if
-                    (lambda (vect) (equal (aref vect 0) 'menu-bar))
-                    keys)))
+        (setq keys (smex-filter-out-menu-bar-bindings keys)))
     (if keys
         (format "You can run the command `%s' with %s"
                 command
                 (mapconcat 'key-description keys ", ")))))
+
+(defsubst smex-filter-out-menu-bar-bindings (keys)
+  (delq nil (mapcar (lambda (key-vec)
+                      (unless (equal (aref key-vec 0) 'menu-bar)
+                        key-vec))
+                    keys)))
 
 (defun smex-unlogged-message (string)
   "Bypasses logging in *Messages*"
