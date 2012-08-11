@@ -438,13 +438,13 @@ Returns nil when reaching the end of the list."
   (let ((library-path (symbol-file mode))
         (mode-name (symbol-name mode))
         commands)
-    
+
     (string-match "\\(.+?\\)\\(-mode\\)?$" mode-name)
     ;; 'lisp-mode' -> 'lisp'
     (setq mode-name (match-string 1 mode-name))
     (if (string= mode-name "c") (setq mode-name "cc"))
     (setq mode-name (regexp-quote mode-name))
-    
+
     (dolist (feature load-history)
       (let ((feature-path (car feature)))
         (when (and feature-path (or (equal feature-path library-path)
