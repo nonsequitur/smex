@@ -1,10 +1,10 @@
 ;;; smex.el --- M-x interface with Ido-style fuzzy matching.
 
-;; Copyright (C) 2009, 2010 Cornelius Mika
+;; Copyright (C) 2009-2012 Cornelius Mika
 ;;
 ;; Author: Cornelius Mika <cornelius.mika@gmail.com>
 ;; URL: http://github.com/nonsequitur/smex/
-;; Version: 1.1.2
+;; Version: 1.1.3
 ;; Keywords: convenience, usability
 
 ;; This file is not part of GNU Emacs.
