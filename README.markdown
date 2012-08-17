@@ -18,9 +18,9 @@ commands. And to all the other commands, too.
 
         (require 'smex)
         (smex-initialize)
-        
+
 * Bind some keys:
-   
+
         (global-set-key (kbd "M-x") 'smex)
         (global-set-key (kbd "M-X") 'smex-major-mode-commands)
         ;; This is your old M-x.
