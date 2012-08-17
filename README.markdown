@@ -16,7 +16,7 @@ commands. And to all the other commands, too.
 
 * To auto-start Smex every time you open Emacs add these lines to your .emacs file:
 
-        (require 'smex)
+        (require 'smex) ; Not needed if you use package.el
         (smex-initialize)
 
 * Bind some keys:
