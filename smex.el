@@ -71,6 +71,7 @@ Set this to nil to disable fuzzy matching."
   :type 'boolean
   :group 'smex)
 
+(defvar smex-initialized-p nil)
 (defvar smex-cache)
 (defvar smex-ido-cache)
 (defvar smex-data)
@@ -81,8 +82,11 @@ Set this to nil to disable fuzzy matching."
 ;;--------------------------------------------------------------------------------
 ;; Smex Interface
 
+;;;###autoload
 (defun smex ()
   (interactive)
+  (unless smex-initialized-p
+    (smex-initialize))
   (if (smex-already-running)
       (smex-update-and-rerun)
     (and smex-auto-update
@@ -241,7 +245,8 @@ This function provides temporary means to aid the transition."
       (setq smex-history nil smex-data nil))
     (smex-detect-new-commands)
     (smex-rebuild-cache)
-    (add-hook 'kill-emacs-hook 'smex-save-to-file)))
+    (add-hook 'kill-emacs-hook 'smex-save-to-file))
+  (setq smex-initialized-p t))
 
 (defun smex-initialize-ido ()
   "Sets up a minimal Ido environment for `ido-completing-read'."
