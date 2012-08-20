@@ -105,6 +105,7 @@ Set this to nil to disable fuzzy matching."
           (funcall action chosen-item))
       (unwind-protect
           (progn (setq prefix-arg current-prefix-arg)
+                 (setq this-command chosen-item)
                  (command-execute chosen-item 'record))
         (smex-rank chosen-item)
         (smex-show-key-advice chosen-item)
