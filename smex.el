@@ -174,7 +174,34 @@ Set this to nil to disable fuzzy matching."
   (setq smex-ido-cache (smex-convert-for-ido smex-cache)))
 
 (defun smex-convert-for-ido (command-items)
-  (mapcar (lambda (command-item) (symbol-name (car command-item))) command-items))
+  (delq nil (mapcar #'(lambda (command-item)
+                              (let ((command-sym (car command-item))
+                                    (command-str (symbol-name (car command-item))))
+                                (if (and command-sym
+                                         (or (get command-sym 'smex-ignore)                   ; request to be ignored
+                                             (get command-sym 'byte-obsolete-info)            ; marked obsolete
+                                             (string-match-p "\\`ad-Orig-" command-str)       ; there is also an advised form with true name
+                                             (string-match-p "\\`menu-bar-" command-str)      ; menu-bar are likely duplicates
+                                             (and (listp (help-function-arglist command-sym)) ; mouse-interactive, roughly
+                                                  (not (eq ?\& (aref (symbol-name (car (help-function-arglist command-sym))) 0)))
+                                                  (stringp (cadr (interactive-form command-sym)))
+                                                  (string-match-p "\\`[*@^]*e" (cadr (interactive-form command-sym))))))
+                                    nil
+                                  ;; else
+                                  command-str)))
+                    command-items)))
+
+(defun smex-ignore (commands)
+  "Tell smex to ignore the list of symbols in COMMANDS.
+
+Ignored commands are still usable, but are hidden from completion
+in smex.
+
+If COMMANDS is a single symbol, it will be coerced to a list."
+  (when (symbolp commands)
+    (setq commands (list commands)))
+  (dolist (sym commands)
+    (put sym 'smex-ignore t)))
 
 (defun smex-restore-history ()
   "Rearranges `smex-cache' according to `smex-history'"
