@@ -50,6 +50,8 @@ currently selected command.
 
 `M-.` jumps to the definition of the selected command.
 
+`C-h w` shows the key bindings for the selected command. (Via `where-is`.)
+
 ### Accessing new commands
 Before accepting user input, Smex checks for new command definitions
 and updates its caches accordingly.
