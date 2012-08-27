@@ -150,6 +150,7 @@ Set this to nil to disable fuzzy matching."
 
 (defun smex-prepare-ido-bindings ()
   (define-key ido-completion-map (kbd "C-h f") 'smex-describe-function)
+  (define-key ido-completion-map (kbd "C-h w") 'smex-where-is-function)
   (define-key ido-completion-map (kbd "M-.") 'smex-find-function)
   (define-key ido-completion-map (kbd "C-a") 'move-beginning-of-line))
 
@@ -384,6 +385,12 @@ Returns nil when reaching the end of the list."
   (smex-do-with-selected-item (lambda (chosen)
                            (describe-function chosen)
                            (pop-to-buffer "*Help*"))))
+
+(defun smex-where-is-function ()
+  "Run `where-is' on the current function."
+  (interactive)
+  (smex-do-with-selected-item (lambda (chosen)
+                                (where-is chosen))))
 
 (defun smex-find-function ()
   (interactive)
