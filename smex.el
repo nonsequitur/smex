@@ -133,7 +133,8 @@ Set this to nil to disable fuzzy matching."
         (ido-enable-prefix nil)
         (ido-enable-flex-matching smex-flex-matching)
         (ido-max-prospects 10))
-    (ido-completing-read (smex-prompt-with-prefix-arg) choices nil nil initial-input)))
+    (ido-completing-read (smex-prompt-with-prefix-arg) choices nil nil
+                         initial-input nil (car choices))))
 
 (defun smex-prompt-with-prefix-arg ()
   (if (not current-prefix-arg)
