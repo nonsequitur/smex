@@ -132,7 +132,8 @@ Set this to nil to disable fuzzy matching."
         (ido-setup-hook (cons 'smex-prepare-ido-bindings ido-setup-hook))
         (ido-enable-prefix nil)
         (ido-enable-flex-matching smex-flex-matching)
-        (ido-max-prospects 10))
+        (ido-max-prospects 10)
+        (ido-ubiquitous-enable-compatibility nil))
     (ido-completing-read (smex-prompt-with-prefix-arg) choices nil nil initial-input)))
 
 (defun smex-prompt-with-prefix-arg ()
