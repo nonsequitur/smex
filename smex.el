@@ -4,7 +4,7 @@
 ;;
 ;; Author: Cornelius Mika <cornelius.mika@gmail.com>
 ;; URL: http://github.com/nonsequitur/smex/
-;; Version: 1.1.3
+;; Version: 1.1.4
 ;; Keywords: convenience, usability
 
 ;; This file is not part of GNU Emacs.
