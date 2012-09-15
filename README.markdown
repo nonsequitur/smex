@@ -86,6 +86,14 @@ Enable `smex-key-advice-ignore-menu-bar` to ignore clues to menu bar bindings.
 
 ## Changelog
 
+### 2.0
+  * Remove `smex-detect-legacy-save-file`.
+    Only relevant (but a breaking change) when you rely on a long deprecated default
+    value of smex-save-file.
+  * Ignore smex-save-file when it's empty instead of raising an error.
+    Warn on invalid data in smex-save-file. Fixes [issue #23]
+    (https://github.com/nonsequitur/smex/issues/23/).
+
 ### 1.1.4
   * Allow running `where-is` on the selected command.
   * Fix compatibility with ido-ubiquitous.
