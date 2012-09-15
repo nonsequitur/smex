@@ -223,16 +223,6 @@ Set this to nil to disable fuzzy matching."
   (run-with-idle-timer idle-time t
                        '(lambda () (if (smex-detect-new-commands) (smex-update)))))
 
-(defun smex-detect-legacy-save-file ()
-  "The default value of `smex-save-file' was changed in between releases.
-This function provides temporary means to aid the transition."
-  (unless (file-readable-p smex-save-file)
-    (let ((legacy-save-file "~/smex.save"))
-      (when (file-readable-p legacy-save-file)
-        (message (format "%s not found. Falling back to %s"
-                         smex-save-file legacy-save-file))
-        (setq smex-save-file legacy-save-file)))))
-
 ;;;###autoload
 (defun smex-initialize ()
   (interactive)
@@ -250,7 +240,6 @@ This function provides temporary means to aid the transition."
 
 (defun smex-load-save-file ()
   "Loads `smex-history' and `smex-data' from `smex-save-file'"
-  (smex-detect-legacy-save-file)
   (let ((save-file (expand-file-name smex-save-file)))
     (if (file-readable-p save-file)
         (with-temp-buffer
