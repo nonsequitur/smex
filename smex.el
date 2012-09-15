@@ -237,6 +237,19 @@ This function provides temporary means to aid the transition."
 (defun smex-initialize ()
   (interactive)
   (unless ido-mode (smex-initialize-ido))
+  (smex-load-save-file)
+  (smex-detect-new-commands)
+  (smex-rebuild-cache)
+  (add-hook 'kill-emacs-hook 'smex-save-to-file)
+  (setq smex-initialized-p t))
+
+(defun smex-initialize-ido ()
+  "Sets up a minimal Ido environment for `ido-completing-read'."
+  (ido-init-completion-maps)
+  (add-hook 'minibuffer-setup-hook 'ido-minibuffer-setup))
+
+(defun smex-load-save-file ()
+  "Loads `smex-history' and `smex-data' from `smex-save-file'"
   (smex-detect-legacy-save-file)
   (let ((save-file (expand-file-name smex-save-file)))
     (if (file-readable-p save-file)
@@ -244,16 +257,7 @@ This function provides temporary means to aid the transition."
           (insert-file-contents save-file)
           (setq smex-history (read (current-buffer))
                 smex-data (read (current-buffer))))
-      (setq smex-history nil smex-data nil))
-    (smex-detect-new-commands)
-    (smex-rebuild-cache)
-    (add-hook 'kill-emacs-hook 'smex-save-to-file))
-  (setq smex-initialized-p t))
-
-(defun smex-initialize-ido ()
-  "Sets up a minimal Ido environment for `ido-completing-read'."
-  (ido-init-completion-maps)
-  (add-hook 'minibuffer-setup-hook 'ido-minibuffer-setup))
+      (setq smex-history nil smex-data nil))))
 
 (defun smex-save-history ()
   "Updates `smex-history'"
