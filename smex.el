@@ -32,7 +32,6 @@
   "M-x interface with Ido-style fuzzy matching and ranking heuristics."
   :group 'extensions
   :group 'convenience
-  :version "1.1"
   :link '(emacs-library-link :tag "Lisp File" "smex.el"))
 
 (defcustom smex-auto-update t
