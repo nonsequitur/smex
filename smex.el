@@ -255,9 +255,18 @@ This function provides temporary means to aid the transition."
     (if (file-readable-p save-file)
         (with-temp-buffer
           (insert-file-contents save-file)
-          (setq smex-history (read (current-buffer))
-                smex-data (read (current-buffer))))
+          (condition-case nil
+              (setq smex-history (read (current-buffer))
+                    smex-data    (read (current-buffer)))
+            (error (if (save-file-not-empty-p)
+                       (error "Invalid data in smex-save-file (%s). Can't restore history."
+                              smex-save-file)
+                     (if (not (boundp 'smex-history)) (setq smex-history))
+                     (if (not (boundp 'smex-data))    (setq smex-data))))))
       (setq smex-history nil smex-data nil))))
+
+(defsubst save-file-not-empty-p ()
+  (string-match-p "\[^[:space:]\]" (buffer-string)))
 
 (defun smex-save-history ()
   "Updates `smex-history'"
