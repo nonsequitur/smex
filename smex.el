@@ -109,6 +109,9 @@ Set this to nil to disable fuzzy matching."
       (unwind-protect
           (progn (setq prefix-arg current-prefix-arg)
                  (setq this-command chosen-item)
+                 ;; Normally setting real-this-command is very bad, but in this case we really want it.
+                 ;; See the comment in execute-extended-command (which does the same thing).
+                 (setq real-this-command chosen-item)
                  (command-execute chosen-item 'record))
         (smex-rank chosen-item)
         (smex-show-key-advice chosen-item)
