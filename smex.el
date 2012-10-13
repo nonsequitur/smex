@@ -108,12 +108,16 @@ Set this to nil to disable fuzzy matching."
           (funcall action chosen-item))
       (unwind-protect
           (progn (setq prefix-arg current-prefix-arg)
+                 ;; Set the chosen command as the current command, like in
+                 ;; `execute-extended-command'
                  (setq this-command chosen-item)
+                 (setq real-this-command chosen-item)
                  (command-execute chosen-item 'record))
         (smex-rank chosen-item)
         (smex-show-key-advice chosen-item)
         ;; Todo: Is there a better way to manipulate 'last-repeatable-command'
         ;; from the inside of an interactively called function?
+        ;; (This is unneeded in Emacs >=24.3 when `real-this-command' has been set.)
         (run-at-time 0.01 nil (lambda (cmd) (setq last-repeatable-command cmd))
                      chosen-item)))))
 
