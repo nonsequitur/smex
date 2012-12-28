@@ -135,7 +135,8 @@ Set this to nil to disable fuzzy matching."
         (ido-setup-hook (cons 'smex-prepare-ido-bindings ido-setup-hook))
         (ido-enable-prefix nil)
         (ido-enable-flex-matching smex-flex-matching)
-        (ido-max-prospects 10))
+        (ido-max-prospects 10)
+        (minibuffer-completion-table choices))
     (ido-completing-read (smex-prompt-with-prefix-arg) choices nil nil
                          initial-input nil (car choices))))
 
@@ -153,6 +154,7 @@ Set this to nil to disable fuzzy matching."
      smex-prompt-string)))
 
 (defun smex-prepare-ido-bindings ()
+  (define-key ido-completion-map (kbd "TAB") 'minibuffer-complete)
   (define-key ido-completion-map (kbd "C-h f") 'smex-describe-function)
   (define-key ido-completion-map (kbd "C-h w") 'smex-where-is)
   (define-key ido-completion-map (kbd "M-.") 'smex-find-function)
