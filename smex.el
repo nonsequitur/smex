@@ -81,6 +81,13 @@ Set this to nil to disable fuzzy matching."
 ;;--------------------------------------------------------------------------------
 ;; Smex Interface
 
+(defsubst smex-already-running ()
+  (and (boundp 'ido-choice-list) (eql ido-choice-list smex-ido-cache)))
+
+(defsubst smex-update-and-rerun ()
+  (smex-do-with-selected-item
+   (lambda (ignore) (smex-update) (smex-read-and-run smex-ido-cache ido-text))))
+
 ;;;###autoload
 (defun smex ()
   (interactive)
@@ -92,13 +99,6 @@ Set this to nil to disable fuzzy matching."
          (smex-detect-new-commands)
          (smex-update))
     (smex-read-and-run smex-ido-cache)))
-
-(defsubst smex-already-running ()
-  (and (boundp 'ido-choice-list) (eql ido-choice-list smex-ido-cache)))
-
-(defsubst smex-update-and-rerun ()
-  (smex-do-with-selected-item
-   (lambda (ignore) (smex-update) (smex-read-and-run smex-ido-cache ido-text))))
 
 (defun smex-read-and-run (commands &optional initial-input)
   (let ((chosen-item (intern (smex-completing-read commands initial-input))))
@@ -120,8 +120,8 @@ Set this to nil to disable fuzzy matching."
 (defun smex-major-mode-commands ()
   "Like `smex', but limited to commands that are relevant to the active major mode."
   (interactive)
-  (let ((commands (delete-dups (append (extract-commands-from-keymap (current-local-map))
-                                       (extract-commands-from-features major-mode)))))
+  (let ((commands (delete-dups (append (smex-extract-commands-from-keymap (current-local-map))
+                                       (smex-extract-commands-from-features major-mode)))))
     (setq commands (smex-sort-according-to-cache commands))
     (setq commands (mapcar #'symbol-name commands))
     (smex-read-and-run commands)))
@@ -237,6 +237,9 @@ Set this to nil to disable fuzzy matching."
   (ido-init-completion-maps)
   (add-hook 'minibuffer-setup-hook 'ido-minibuffer-setup))
 
+(defsubst smex-save-file-not-empty-p ()
+  (string-match-p "\[^[:space:]\]" (buffer-string)))
+
 (defun smex-load-save-file ()
   "Loads `smex-history' and `smex-data' from `smex-save-file'"
   (let ((save-file (expand-file-name smex-save-file)))
@@ -246,15 +249,12 @@ Set this to nil to disable fuzzy matching."
           (condition-case nil
               (setq smex-history (read (current-buffer))
                     smex-data    (read (current-buffer)))
-            (error (if (save-file-not-empty-p)
+            (error (if (smex-save-file-not-empty-p)
                        (error "Invalid data in smex-save-file (%s). Can't restore history."
                               smex-save-file)
                      (if (not (boundp 'smex-history)) (setq smex-history))
                      (if (not (boundp 'smex-data))    (setq smex-data))))))
       (setq smex-history nil smex-data nil))))
-
-(defsubst save-file-not-empty-p ()
-  (string-match-p "\[^[:space:]\]" (buffer-string)))
 
 (defun smex-save-history ()
   "Updates `smex-history'"
@@ -414,6 +414,12 @@ Returns nil when reaching the end of the list."
                                      (smex-unlogged-message smex-old-message))) advice))
         (smex-unlogged-message advice)))))
 
+(defsubst smex-filter-out-menu-bar-bindings (keys)
+  (delq nil (mapcar (lambda (key-vec)
+                      (unless (equal (aref key-vec 0) 'menu-bar)
+                        key-vec))
+                    keys)))
+
 (defun smex-key-advice (command)
   (let ((keys (where-is-internal command)))
     (if smex-key-advice-ignore-menu-bar
@@ -423,32 +429,26 @@ Returns nil when reaching the end of the list."
                 command
                 (mapconcat 'key-description keys ", ")))))
 
-(defsubst smex-filter-out-menu-bar-bindings (keys)
-  (delq nil (mapcar (lambda (key-vec)
-                      (unless (equal (aref key-vec 0) 'menu-bar)
-                        key-vec))
-                    keys)))
-
 (defun smex-unlogged-message (string)
   "Bypasses logging in *Messages*"
   (let (message-log-max)
     (message "%s" string)))
 
-(defun extract-commands-from-keymap (map)
+(defun smex-extract-commands-from-keymap (map)
   (let (commands)
-    (parse-keymap map)
+    (parse-keymap map commands)
     commands))
 
-(defun parse-keymap (map)
+(defun parse-keymap (map commands)
   (map-keymap (lambda (binding element)
                 (if (and (listp element) (eq 'keymap (car element)))
-                    (parse-keymap element)
+                    (parse-keymap element commands)
                           ; Strings are commands, too. Reject them.
-                  (if (and (symbolp element) (commandp element))
-                      (setq commands (cons element commands)))))
+                  (when (and (symbolp element) (commandp element))
+                    (push element commands))))
               map))
 
-(defun extract-commands-from-features (mode)
+(defun smex-extract-commands-from-features (mode)
   (let ((library-path (symbol-file mode))
         (mode-name (symbol-name mode))
         commands)
