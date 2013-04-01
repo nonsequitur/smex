@@ -120,8 +120,8 @@ Set this to nil to disable fuzzy matching."
 (defun smex-major-mode-commands ()
   "Like `smex', but limited to commands that are relevant to the active major mode."
   (interactive)
-  (let ((commands (delete-dups (append (extract-commands-from-keymap (current-local-map))
-                                       (extract-commands-from-features major-mode)))))
+  (let ((commands (delete-dups (append (smex-extract-commands-from-keymap (current-local-map))
+                                       (smex-extract-commands-from-features major-mode)))))
     (setq commands (smex-sort-according-to-cache commands))
     (setq commands (mapcar #'symbol-name commands))
     (smex-read-and-run commands)))
@@ -246,7 +246,7 @@ Set this to nil to disable fuzzy matching."
           (condition-case nil
               (setq smex-history (read (current-buffer))
                     smex-data    (read (current-buffer)))
-            (error (if (save-file-not-empty-p)
+            (error (if (smex-save-file-not-empty-p)
                        (error "Invalid data in smex-save-file (%s). Can't restore history."
                               smex-save-file)
                      (if (not (boundp 'smex-history)) (setq smex-history))
@@ -434,21 +434,21 @@ Returns nil when reaching the end of the list."
   (let (message-log-max)
     (message "%s" string)))
 
-(defun extract-commands-from-keymap (map)
+(defun smex-extract-commands-from-keymap (map)
   (let (commands)
-    (parse-keymap map)
+    (smex-parse-keymap map)
     commands))
 
-(defun parse-keymap (map)
+(defun smex-parse-keymap (map)
   (map-keymap (lambda (binding element)
                 (if (and (listp element) (eq 'keymap (car element)))
-                    (parse-keymap element)
+                    (smex-parse-keymap element)
                           ; Strings are commands, too. Reject them.
                   (if (and (symbolp element) (commandp element))
                       (setq commands (cons element commands)))))
               map))
 
-(defun extract-commands-from-features (mode)
+(defun smex-extract-commands-from-features (mode)
   (let ((library-path (symbol-file mode))
         (mode-name (symbol-name mode))
         commands)
