@@ -436,16 +436,16 @@ Returns nil when reaching the end of the list."
 
 (defun smex-extract-commands-from-keymap (map)
   (let (commands)
-    (smex-parse-keymap map)
+    (smex-parse-keymap map commands)
     commands))
 
-(defun smex-parse-keymap (map)
+(defun smex-parse-keymap (map commands)
   (map-keymap (lambda (binding element)
                 (if (and (listp element) (eq 'keymap (car element)))
-                    (smex-parse-keymap element)
+                    (smex-parse-keymap element commands)
                           ; Strings are commands, too. Reject them.
                   (if (and (symbolp element) (commandp element))
-                      (setq commands (cons element commands)))))
+                      (push element commands))))
               map))
 
 (defun smex-extract-commands-from-features (mode)
