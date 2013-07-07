@@ -11,8 +11,10 @@ commands. And to all the other commands, too.
 ## Get started
 
 * Get Smex
-   * Via [package.el](http://marmalade-repo.org/packages/smex).
-   * Or manually download Smex and set-up your load path. [(Find out more.)](http://www.emacswiki.org/emacs/InstallingPackages)
+   * Via [Marmalade](http://marmalade-repo.org/packages/smex) or
+     [MELPA](http://melpa.milkbox.net/).
+   * Or manually download Smex and set-up your load path.
+     [(Find out more.)](http://www.emacswiki.org/emacs/InstallingPackages)
 
 * To auto-start Smex every time you open Emacs add these lines to your .emacs file:
 
