@@ -88,6 +88,10 @@ Enable `smex-key-advice-ignore-menu-bar` to ignore clues to menu bar bindings.
 
 ## Changelog
 
+### 2.1
+  * Improved tab completion in the Smex minibuffer
+  * Add compatibility with command-frequency
+
 ### 2.0
   * Remove `smex-detect-legacy-save-file`.
     Only relevant (but a breaking change) when you rely on a long deprecated default
