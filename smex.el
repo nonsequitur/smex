@@ -59,11 +59,6 @@ Must be set before initializing Smex."
   :type 'string
   :group 'smex)
 
-(defcustom smex-key-advice-ignore-menu-bar nil
-  "If non-nil, `smex-key-advice' ignores `menu-bar' bindings"
-  :type 'boolean
-  :group 'smex)
-
 (defcustom smex-flex-matching t
   "Enables Ido flex matching. On by default.
 Set this to nil to disable fuzzy matching."
@@ -101,25 +96,15 @@ Set this to nil to disable fuzzy matching."
    (lambda (ignore) (smex-update) (smex-read-and-run smex-ido-cache ido-text))))
 
 (defun smex-read-and-run (commands &optional initial-input)
-  (let ((chosen-item (intern (smex-completing-read commands initial-input))))
+  (let* ((chosen-item-name (smex-completing-read commands initial-input))
+         (chosen-item (intern chosen-item-name)))
     (if smex-custom-action
         (let ((action smex-custom-action))
           (setq smex-custom-action nil)
           (funcall action chosen-item))
       (unwind-protect
-          (progn (setq prefix-arg current-prefix-arg)
-                 ;; Set the chosen command as the current command, like in
-                 ;; `execute-extended-command'
-                 (setq this-command chosen-item)
-                 (setq real-this-command chosen-item)
-                 (command-execute chosen-item 'record))
-        (smex-rank chosen-item)
-        (smex-show-key-advice chosen-item)
-        ;; Todo: Is there a better way to manipulate 'last-repeatable-command'
-        ;; from the inside of an interactively called function?
-        ;; (This is unneeded in Emacs >=24.3 when `real-this-command' has been set.)
-        (run-at-time 0.01 nil (lambda (cmd) (setq last-repeatable-command cmd))
-                     chosen-item)))))
+          (execute-extended-command current-prefix-arg chosen-item-name)
+        (smex-rank chosen-item)))))
 
 (defun smex-major-mode-commands ()
   "Like `smex', but limited to commands that are relevant to the active major mode."
@@ -401,44 +386,6 @@ Returns nil when reaching the end of the list."
 (defun smex-find-function ()
   (interactive)
   (smex-do-with-selected-item 'find-function))
-
-(defvar smex-old-message nil
-  "A temporary storage used by `smex-show-key-advice'")
-
-(defun smex-show-key-advice (command)
-  "Shows the keybinding for command, if available. Like `execute-extended-command'."
-  (let ((advice (smex-key-advice command)))
-    (when advice
-      (if (current-message)
-          (progn
-            (run-at-time 2 nil (lambda (advice)
-                                 (setq smex-old-message (current-message))
-                                 (smex-unlogged-message advice)) advice)
-
-            (run-at-time 4.5 nil (lambda (advice)
-                                 (if (equal (current-message) advice)
-                                     (smex-unlogged-message smex-old-message))) advice))
-        (smex-unlogged-message advice)))))
-
-(defun smex-key-advice (command)
-  (let ((keys (where-is-internal command)))
-    (if smex-key-advice-ignore-menu-bar
-        (setq keys (smex-filter-out-menu-bar-bindings keys)))
-    (if keys
-        (format "You can run the command `%s' with %s"
-                command
-                (mapconcat 'key-description keys ", ")))))
-
-(defsubst smex-filter-out-menu-bar-bindings (keys)
-  (delq nil (mapcar (lambda (key-vec)
-                      (unless (equal (aref key-vec 0) 'menu-bar)
-                        key-vec))
-                    keys)))
-
-(defun smex-unlogged-message (string)
-  "Bypasses logging in *Messages*"
-  (let (message-log-max)
-    (message "%s" string)))
 
 (defun smex-extract-commands-from-keymap (map)
   (let (commands)
