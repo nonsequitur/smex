@@ -259,7 +259,7 @@ Set this to nil to disable fuzzy matching."
                      (if (not (boundp 'smex-data))    (setq smex-data))))))
       (setq smex-history nil smex-data nil))))
 
-(defsubst save-file-not-empty-p ()
+(defsubst smex-save-file-not-empty-p ()
   (string-match-p "\[^[:space:]\]" (buffer-string)))
 
 (defun smex-save-history ()
