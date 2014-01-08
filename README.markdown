@@ -88,6 +88,16 @@ Set `smex-prompt-string` for a custom prompt.
 
 ## Changelog
 
+### 3.0
+  * Use `execute-extended-command` for running commands.
+    This breaks support for Emacs versions older than 23 and
+    obviates the user option `smex-key-advice-ignore-menu-bar`.
+    (The default Emacs behaviour is to not show menu bar bindings.)
+
+    As a result of this change, the variable `suggest-key-bindings`
+    is now honored when executing commands.
+  * Save command history in `extended-command-history`, like M-x.
+
 ### 2.1
   * Improved tab completion in the Smex minibuffer
   * Add compatibility with command-frequency
