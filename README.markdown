@@ -8,6 +8,9 @@ commands. And to all the other commands, too.
 
 ![Smex](https://sites.google.com/site/cumulatm/home/SmexScreenshotImage.png)
 
+## [Changelog](#changelog-1)
+Jump to [Changelog](#changelog-1).
+
 ## Get started
 
 * Get Smex
