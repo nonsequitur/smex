@@ -89,7 +89,9 @@ Set this to nil to disable fuzzy matching."
     (smex-read-and-run smex-ido-cache)))
 
 (defsubst smex-already-running ()
-  (and (boundp 'ido-choice-list) (eql ido-choice-list smex-ido-cache)))
+  (and (boundp 'ido-choice-list)
+       (eql ido-choice-list smex-ido-cache)
+       (minibuffer-window-active-p (selected-window))))
 
 (defsubst smex-update-and-rerun ()
   (smex-do-with-selected-item
