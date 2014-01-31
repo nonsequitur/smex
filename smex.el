@@ -73,6 +73,12 @@ Set this to nil to disable fuzzy matching."
 (defvar smex-command-count 0)
 (defvar smex-custom-action nil)
 
+;; Check if Smex is supported
+(when (equal (cons 1 1)
+             (ignore-errors
+               (subr-arity (symbol-function 'execute-extended-command))))
+  (error "Your Emacs has a non-elisp version of `execute-extended-command', which is incompatible with Smex"))
+
 ;;--------------------------------------------------------------------------------
 ;; Smex Interface
 
