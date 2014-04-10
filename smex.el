@@ -4,6 +4,7 @@
 ;;
 ;; Author: Cornelius Mika <cornelius.mika@gmail.com> and contributors
 ;; URL: http://github.com/nonsequitur/smex/
+;; Package-Requires: ((emacs "24"))
 ;; Version: 3.0
 ;; Keywords: convenience, usability
 
