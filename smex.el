@@ -35,6 +35,13 @@
   :group 'convenience
   :link '(emacs-library-link :tag "Lisp File" "smex.el"))
 
+(defcustom smex-acronyms t
+  "If non-nil, you can use acronyms instead of the whole command names.
+E.g.: 'ff' instead of 'find-file', or 'ffow' instead of
+'find-file-other-window."
+  :type 'boolean
+  :group 'smex)
+
 (defcustom smex-auto-update t
   "If non-nil, `Smex' checks for new commands each time it is run.
 Turn it off for minor speed improvements on older systems."
@@ -453,6 +460,34 @@ sorted by frequency of use."
       (ido-pp 'unbound-commands))
     (set-buffer-modified-p nil)
     (goto-char (point-min))))
+
+;;; Filters ido-matches setting acronynm matches in front of the results
+(defadvice ido-set-matches-1 (after ido-smex-acronym-matches activate)
+  (if (and smex-acronyms (> (length ido-text) 1))
+      (let ((regex (concat "^" (mapconcat 'char-to-string ido-text "[^-]*-")))
+            (acronym-matches (list))
+            (remove-regexes '("-menu-")))
+        ;; Creating the list of the results to be set as first
+        (dolist (item items)
+          (if (string-match (concat regex "[^-]*$") item) ;; strict match
+              (add-to-list 'acronym-matches item)
+            (if (string-match regex item) ;; appending relaxed match
+                (add-to-list 'acronym-matches item t))))
+
+        ;; Filtering ad-return-value
+        (dolist (to_remove remove-regexes)
+          (setq ad-return-value
+                (delete-if (lambda (item)
+                             (string-match to_remove item))
+                           ad-return-value)))
+
+        ;; Creating resulting list
+        (setq ad-return-value
+              (append acronym-matches
+                      ad-return-value))
+
+        (delete-dups ad-return-value)
+        (reverse ad-return-value))))
 
 (provide 'smex)
 ;;; smex.el ends here
