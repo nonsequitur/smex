@@ -486,8 +486,7 @@ sorted by frequency of use."
               (append acronym-matches
                       ad-return-value))
 
-        (delete-dups ad-return-value)
-        (reverse ad-return-value))))
+        (delete-dups ad-return-value))))
 
 (provide 'smex)
 ;;; smex.el ends here
