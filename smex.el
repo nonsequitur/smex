@@ -461,25 +461,18 @@ sorted by frequency of use."
     (set-buffer-modified-p nil)
     (goto-char (point-min))))
 
-;;; Filters ido-matches setting acronynm matches in front of the results
 (defadvice ido-set-matches-1 (after ido-smex-acronym-matches activate)
+  "Filters ido-matches by setting acronynms in front of the ad-return-value."
   (if (and smex-acronyms (> (length ido-text) 1))
       (let ((regex (concat "^" (mapconcat 'char-to-string ido-text "[^-]*-")))
-            (acronym-matches (list))
-            (remove-regexes '("-menu-")))
+            (acronym-matches (list)))
+
         ;; Creating the list of the results to be set as first
         (dolist (item items)
           (if (string-match (concat regex "[^-]*$") item) ;; strict match
               (add-to-list 'acronym-matches item)
             (if (string-match regex item) ;; appending relaxed match
                 (add-to-list 'acronym-matches item t))))
-
-        ;; Filtering ad-return-value
-        (dolist (to_remove remove-regexes)
-          (setq ad-return-value
-                (delete-if (lambda (item)
-                             (string-match to_remove item))
-                           ad-return-value)))
 
         ;; Creating resulting list
         (setq ad-return-value
