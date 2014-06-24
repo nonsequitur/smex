@@ -52,7 +52,11 @@ Turn it off for minor speed improvements on older systems."
   "List used by `Smex' to hide command names. Every command name that matches
 one of these regexes will be hide."
   :type '(repeat regexp)
-  :group 'smex)
+  :initialize 'custom-initialize-default
+  :set (lambda (symbol value)
+         (set-default symbol value)
+         (smex-update)))
+  :group 'smex
 
 (defcustom smex-save-file (locate-user-emacs-file "smex-items" ".smex-items")
   "File in which the smex state is saved between Emacs sessions.
