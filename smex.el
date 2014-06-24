@@ -202,7 +202,7 @@ Set this to nil to disable fuzzy matching."
 
 (defun smex-filter-commands (commands)
   (dolist (filter smex-filter-alist commands)
-    (delete-if (lambda (item) (string-match filter item)) commands)))
+    (cl-delete-if (lambda (item) (string-match filter item)) commands)))
 
 (defun smex-convert-for-ido (command-items)
   (mapcar (lambda (command-item) (symbol-name (car command-item))) command-items))
