@@ -460,4 +460,7 @@ sorted by frequency of use."
     (goto-char (point-min))))
 
 (provide 'smex)
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
 ;;; smex.el ends here
