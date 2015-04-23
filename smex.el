@@ -155,8 +155,10 @@ Set this to nil to disable fuzzy matching."
         (ido-completing-read (smex-prompt-with-prefix-arg) choices nil nil
                              initial-input 'extended-command-history (car choices)))
     (require 'ivy)
-    (ivy-read (smex-prompt-with-prefix-arg)
-              choices nil nil smex-map (car choices))))
+    (ivy-read (smex-prompt-with-prefix-arg) choices
+              :keymap smex-map
+              :history 'extended-command-history
+              :preselect (car choices))))
 
 (defun smex-prompt-with-prefix-arg ()
   (if (not current-prefix-arg)
