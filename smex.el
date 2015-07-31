@@ -241,7 +241,8 @@ Set this to nil to disable fuzzy matching."
 
 (defun smex-initialize-ido ()
   "Sets up a minimal Ido environment for `ido-completing-read'."
-  (ido-init-completion-maps)
+  (with-no-warnings ; `ido-init-completion-maps' is deprecated in Emacs 25
+    (ido-init-completion-maps))
   (add-hook 'minibuffer-setup-hook 'ido-minibuffer-setup))
 
 (defsubst smex-save-file-not-empty-p ()
