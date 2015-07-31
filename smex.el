@@ -112,7 +112,8 @@ Set this to nil to disable fuzzy matching."
           (setq smex-custom-action nil)
           (funcall action chosen-item))
       (unwind-protect
-          (execute-extended-command current-prefix-arg chosen-item-name)
+          (with-no-warnings
+            (execute-extended-command current-prefix-arg chosen-item-name))
         (smex-rank chosen-item)))))
 
 ;;;###autoload
