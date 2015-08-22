@@ -95,12 +95,12 @@ Set this to nil to disable fuzzy matching."
          (smex-update))
     (smex-read-and-run smex-ido-cache)))
 
-(defsubst smex-already-running ()
+(defun smex-already-running ()
   (and (boundp 'ido-choice-list)
        (eql ido-choice-list smex-ido-cache)
        (minibuffer-window-active-p (selected-window))))
 
-(defsubst smex-update-and-rerun ()
+(defun smex-update-and-rerun ()
   (smex-do-with-selected-item
    (lambda (_) (smex-update) (smex-read-and-run smex-ido-cache ido-text))))
 
@@ -243,6 +243,9 @@ Set this to nil to disable fuzzy matching."
   (ido-init-completion-maps)
   (add-hook 'minibuffer-setup-hook 'ido-minibuffer-setup))
 
+(defsubst smex-save-file-not-empty-p ()
+  (string-match-p "\[^[:space:]\]" (buffer-string)))
+
 (defun smex-load-save-file ()
   "Loads `smex-history' and `smex-data' from `smex-save-file'"
   (let ((save-file (expand-file-name smex-save-file)))
@@ -258,9 +261,6 @@ Set this to nil to disable fuzzy matching."
                      (if (not (boundp 'smex-history)) (setq smex-history))
                      (if (not (boundp 'smex-data))    (setq smex-data))))))
       (setq smex-history nil smex-data nil))))
-
-(defsubst smex-save-file-not-empty-p ()
-  (string-match-p "\[^[:space:]\]" (buffer-string)))
 
 (defun smex-save-history ()
   "Updates `smex-history'"
