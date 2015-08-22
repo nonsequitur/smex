@@ -102,7 +102,7 @@ Set this to nil to disable fuzzy matching."
 
 (defsubst smex-update-and-rerun ()
   (smex-do-with-selected-item
-   (lambda (ignore) (smex-update) (smex-read-and-run smex-ido-cache ido-text))))
+   (lambda (_) (smex-update) (smex-read-and-run smex-ido-cache ido-text))))
 
 (defun smex-read-and-run (commands &optional initial-input)
   (let* ((chosen-item-name (smex-completing-read commands initial-input))
