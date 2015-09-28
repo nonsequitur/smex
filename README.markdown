@@ -15,7 +15,7 @@ Jump to [Changelog](#changelog-1).
 
 * Get Smex
    * Via [Marmalade](http://marmalade-repo.org/packages/smex) or
-     [MELPA](http://melpa.milkbox.net/).
+     [MELPA](https://melpa.org/).
    * Or manually download Smex and set-up your load path.
      [(Find out more.)](http://www.emacswiki.org/emacs/InstallingPackages)
 
