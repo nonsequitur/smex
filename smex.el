@@ -260,8 +260,8 @@ Set this to nil to disable fuzzy matching."
             (error (if (smex-save-file-not-empty-p)
                        (error "Invalid data in smex-save-file (%s). Can't restore history."
                               smex-save-file)
-                     (if (not (boundp 'smex-history)) (setq smex-history))
-                     (if (not (boundp 'smex-data))    (setq smex-data))))))
+                     (unless (boundp 'smex-history) (setq smex-history nil))
+                     (unless (boundp 'smex-data)    (setq smex-data nil))))))
       (setq smex-history nil smex-data nil))))
 
 (defun smex-save-history ()
