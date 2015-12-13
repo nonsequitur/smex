@@ -35,36 +35,37 @@
   :group 'convenience
   :link '(emacs-library-link :tag "Lisp File" "smex.el"))
 
+(defcustom smex-completion-method 'ido
+  "Method to select a candidate from a list of strings."
+  :type '(choice
+          (const :tag "Ido" ido)
+          (const :tag "Ivy" ivy)))
+
 (defcustom smex-auto-update t
   "If non-nil, `Smex' checks for new commands each time it is run.
 Turn it off for minor speed improvements on older systems."
-  :type 'boolean
-  :group 'smex)
+  :type 'boolean)
 
 (defcustom smex-save-file (locate-user-emacs-file "smex-items" ".smex-items")
   "File in which the smex state is saved between Emacs sessions.
 Variables stored are: `smex-data', `smex-history'.
 Must be set before initializing Smex."
-  :type 'string
-  :group 'smex)
+  :type 'string)
 
 (defcustom smex-history-length 7
   "Determines on how many recently executed commands
 Smex should keep a record.
 Must be set before initializing Smex."
-  :type 'integer
-  :group 'smex)
+  :type 'integer)
 
 (defcustom smex-prompt-string "M-x "
   "String to display in the Smex prompt."
-  :type 'string
-  :group 'smex)
+  :type 'string)
 
 (defcustom smex-flex-matching t
   "Enables Ido flex matching. On by default.
 Set this to nil to disable fuzzy matching."
-  :type 'boolean
-  :group 'smex)
+  :type 'boolean)
 
 (defvar smex-initialized-p nil)
 (defvar smex-cache)
@@ -128,15 +129,37 @@ Set this to nil to disable fuzzy matching."
     (setq commands (mapcar #'symbol-name commands))
     (smex-read-and-run commands)))
 
+(defvar smex-map (let ((map (make-sparse-keymap)))
+                   (define-key map (kbd "TAB") 'minibuffer-complete)
+                   (define-key map (kbd "C-h f") 'smex-describe-function)
+                   (define-key map (kbd "C-h w") 'smex-where-is)
+                   (define-key map (kbd "M-.") 'smex-find-function)
+                   (define-key map (kbd "C-a") 'move-beginning-of-line)
+                   map)
+  "Keymap used in the minibuffer.")
+
+(defun smex-prepare-ido-bindings ()
+  (setq ido-completion-map
+        (make-composed-keymap '(smex-map ido-completion-map))))
+
+(declare-function ivy-read "ext:ivy")
+(declare-function ivy-done "ext:ivy")
+
 (defun smex-completing-read (choices initial-input)
-  (let ((ido-completion-map ido-completion-map)
-        (ido-setup-hook (cons 'smex-prepare-ido-bindings ido-setup-hook))
-        (ido-enable-prefix nil)
-        (ido-enable-flex-matching smex-flex-matching)
-        (ido-max-prospects 10)
-        (minibuffer-completion-table choices))
-    (ido-completing-read (smex-prompt-with-prefix-arg) choices nil nil
-                         initial-input 'extended-command-history (car choices))))
+  (if (eq smex-completion-method 'ido)
+      (let ((ido-completion-map ido-completion-map)
+            (ido-setup-hook (cons 'smex-prepare-ido-bindings ido-setup-hook))
+            (ido-enable-prefix nil)
+            (ido-enable-flex-matching smex-flex-matching)
+            (ido-max-prospects 10)
+            (minibuffer-completion-table choices))
+        (ido-completing-read (smex-prompt-with-prefix-arg) choices nil nil
+                             initial-input 'extended-command-history (car choices)))
+    (require 'ivy)
+    (ivy-read (smex-prompt-with-prefix-arg) choices
+              :keymap smex-map
+              :history 'extended-command-history
+              :preselect (car choices))))
 
 (defun smex-prompt-with-prefix-arg ()
   (if (not current-prefix-arg)
@@ -150,13 +173,6 @@ Set this to nil to disable fuzzy matching."
              "C-u "
            (format "%d " (car current-prefix-arg)))))
      smex-prompt-string)))
-
-(defun smex-prepare-ido-bindings ()
-  (define-key ido-completion-map (kbd "TAB") 'minibuffer-complete)
-  (define-key ido-completion-map (kbd "C-h f") 'smex-describe-function)
-  (define-key ido-completion-map (kbd "C-h w") 'smex-where-is)
-  (define-key ido-completion-map (kbd "M-.") 'smex-find-function)
-  (define-key ido-completion-map (kbd "C-a") 'move-beginning-of-line))
 
 ;;--------------------------------------------------------------------------------
 ;; Cache and Maintenance
@@ -232,7 +248,8 @@ Set this to nil to disable fuzzy matching."
 ;;;###autoload
 (defun smex-initialize ()
   (interactive)
-  (unless ido-mode (smex-initialize-ido))
+  (when (eq smex-completion-method 'ido)
+    (unless ido-mode (smex-initialize-ido)))
   (smex-load-save-file)
   (smex-detect-new-commands)
   (smex-rebuild-cache)
@@ -392,7 +409,9 @@ Returns nil when reaching the end of the list."
 
 (defun smex-do-with-selected-item (fn)
   (setq smex-custom-action fn)
-  (ido-exit-minibuffer))
+  (if (eq smex-completion-method 'ido)
+      (ido-exit-minibuffer)
+    (ivy-done)))
 
 (defun smex-describe-function ()
   (interactive)
