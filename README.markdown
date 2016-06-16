@@ -16,6 +16,7 @@ Jump to [Changelog](#changelog-1).
 * Get Smex
    * Via [Marmalade](http://marmalade-repo.org/packages/smex) or
      [MELPA](http://melpa.milkbox.net/).
+   * On Debian 9 or later or Ubuntu 16.10 or later: `apt-get install elpa-smex`
    * Or manually download Smex and set-up your load path.
      [(Find out more.)](http://www.emacswiki.org/emacs/InstallingPackages)
 
