@@ -90,9 +90,7 @@ Set this to nil to disable fuzzy matching."
     (smex-initialize))
   (if (smex-already-running)
       (smex-update-and-rerun)
-    (and smex-auto-update
-         (smex-detect-new-commands)
-         (smex-update))
+    (and smex-auto-update (smex-update-if-needed))
     (smex-read-and-run smex-ido-cache)))
 
 (defun smex-already-running ()
@@ -223,11 +221,13 @@ Set this to nil to disable fuzzy matching."
     (unless (= i smex-command-count)
       (setq smex-command-count i))))
 
+(defun smex-update-if-needed ()
+  (if (smex-detect-new-commands) (smex-update)))
+
 (defun smex-auto-update (&optional idle-time)
   "Update Smex when Emacs has been idle for IDLE-TIME."
   (unless idle-time (setq idle-time 60))
-  (run-with-idle-timer idle-time t
-                       '(lambda () (if (smex-detect-new-commands) (smex-update)))))
+  (run-with-idle-timer idle-time t 'smex-update-if-needed))
 
 ;;;###autoload
 (defun smex-initialize ()
@@ -462,6 +462,25 @@ sorted by frequency of use."
       (smex-pp unbound-commands))
     (set-buffer-modified-p nil)
     (goto-char (point-min))))
+
+(defmacro smex-auto-update-after (&rest functions)
+  "Advise each of FUNCTIONS to execute smex-update upon completion."
+  (cons
+   'progn
+   (mapcar (lambda (fun)
+             `(defadvice ,fun (after smex-update activate)
+                "Run smex-update upon completion"
+                (ignore-errors
+                  (when (and smex-initialized-p smex-auto-update)
+                    (smex-update-if-needed)))))
+           ;; Defining advice on `eval' causes infinite recursion, so
+           ;; don't allow that.
+           (delete-if (apply-partially 'equal 'eval)
+                      functions))))
+
+;; If you call `smex-update' after every invocation of just these few
+;; functions, you almost never need any other updates.
+(smex-auto-update-after load eval-last-sexp eval-buffer eval-region eval-expression)
 
 ;; A copy of `ido-pp' that's compatible with lexical bindings
 (defun smex-pp* (list list-name)
