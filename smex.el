@@ -35,6 +35,19 @@
   :group 'convenience
   :link '(emacs-library-link :tag "Lisp File" "smex.el"))
 
+;;;###autoload
+(define-minor-mode smex-mode
+  "Use ido completion for M-x"
+  :global t
+  :group 'smex
+  (if smex-mode
+      (progn
+        (unless smex-initialized-p
+          (smex-initialize))
+        (global-set-key [remap execute-extended-command] 'smex))
+    (when (eq (global-key-binding [remap execute-extended-command]) 'smex)
+      (global-unset-key [remap execute-extended-command]))))
+
 (defcustom smex-auto-update t
   "If non-nil, `Smex' checks for new commands each time it is run.
 Turn it off for minor speed improvements on older systems."
