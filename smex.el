@@ -471,7 +471,7 @@ sorted by frequency of use."
              `(defadvice ,fun (after smex-update activate)
                 "Run smex-update upon completion"
                 (ignore-errors
-                  (when (bound-and-true-p smex-auto-update)
+                  (when (and smex-initialized-p smex-auto-update)
                     (smex-update-if-needed)))))
            ;; Defining advice on `eval' causes infinite recursion, so
            ;; don't allow that.
