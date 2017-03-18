@@ -7,6 +7,7 @@
 ;; Package-Requires: ((emacs "24"))
 ;; Version: 3.0
 ;; Keywords: convenience, usability
+;; Package-Requires: ((ido-completing-read+ "0"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -28,6 +29,7 @@
 ;;; Code:
 
 (require 'ido)
+(require 'ido-completing-read+)
 
 (defgroup smex nil
   "M-x interface with Ido-style fuzzy matching and ranking heuristics."
@@ -135,8 +137,8 @@ Set this to nil to disable fuzzy matching."
         (ido-enable-flex-matching smex-flex-matching)
         (ido-max-prospects 10)
         (minibuffer-completion-table choices))
-    (ido-completing-read (smex-prompt-with-prefix-arg) choices nil nil
-                         initial-input 'extended-command-history (car choices))))
+    (ido-completing-read+ (smex-prompt-with-prefix-arg) choices nil t
+                          initial-input 'extended-command-history (car choices))))
 
 (defun smex-prompt-with-prefix-arg ()
   (if (not current-prefix-arg)
