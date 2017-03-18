@@ -138,7 +138,7 @@ Set this to nil to disable fuzzy matching."
         (ido-max-prospects 10)
         (minibuffer-completion-table choices))
     (ido-completing-read+ (smex-prompt-with-prefix-arg) choices nil t
-                          initial-input 'extended-command-history (car choices))))
+                          initial-input 'extended-command-history)))
 
 (defun smex-prompt-with-prefix-arg ()
   (if (not current-prefix-arg)
