@@ -152,10 +152,9 @@ is idle."
 (defun smex-find-keybinding (command)
   "Find the first keybinding for COMMAND, if one exists.
 Uses the currently active keymap."
-  (let* ((keybindings (where-is-internal command))
-         (first-binding (car keybindings)))
-    (when first-binding
-      (key-description first-binding))))
+  (let ((keybinding (where-is-internal command nil t t)))
+    (when keybinding
+      (key-description keybinding))))
 
 (defun smex-completing-read (choices initial-input)
   (let ((ido-completion-map ido-completion-map)
@@ -264,9 +263,11 @@ Uses the currently active keymap."
 (defun smex-background-update ()
   "Update Smex when Emacs has been idle for 20 seconds."
   (run-with-idle-timer 20 t
-                       '(lambda () (when (smex-detect-new-commands)
-                                     (smex-update-command-keybindings)
-                                     (smex-update)))))
+                       '(lambda ()
+			  (when (or (= 0 (hash-table-count smex-command-keybindings))
+				    (smex-detect-new-commands))
+			    (smex-update-command-keybindings)
+			    (smex-update)))))
 
 ;;;###autoload
 (defun smex-initialize ()
