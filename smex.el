@@ -35,6 +35,10 @@
   :group 'convenience
   :link '(emacs-library-link :tag "Lisp File" "smex.el"))
 
+(defface smex-keybinding-face
+  '((t (:foreground "orange" :weight bold)))
+  "Burndown warning 2" :group 'smex)
+
 (defcustom smex-auto-update t
   "If non-nil, `Smex' checks for new commands each time it is run.
 Turn it off for minor speed improvements on older systems."
@@ -218,7 +222,11 @@ Uses the currently active keymap."
                    (keybinding
                     (gethash command smex-command-keybindings)))
               (if keybinding
-                  (format "%s (%s)" command-name keybinding)
+		  (concat
+		   (format "%s" command-name)
+		   (propertize
+		    (format " (%s)" keybinding)
+		    'face 'smex-keybinding-face))
                 command-name)))
           command-items))
 
