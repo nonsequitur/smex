@@ -35,6 +35,10 @@
   :group 'convenience
   :link '(emacs-library-link :tag "Lisp File" "smex.el"))
 
+(defface smex-keybinding-face
+  '((t (:foreground "orange" :weight bold)))
+  "Burndown warning 2" :group 'smex)
+
 (defcustom smex-auto-update t
   "If non-nil, `Smex' checks for new commands each time it is run.
 Turn it off for minor speed improvements on older systems."
@@ -152,10 +156,9 @@ is idle."
 (defun smex-find-keybinding (command)
   "Find the first keybinding for COMMAND, if one exists.
 Uses the currently active keymap."
-  (let* ((keybindings (where-is-internal command))
-         (first-binding (car keybindings)))
-    (when first-binding
-      (key-description first-binding))))
+  (let ((keybinding (where-is-internal command nil t t)))
+    (when keybinding
+      (key-description keybinding))))
 
 (defun smex-completing-read (choices initial-input)
   (let ((ido-completion-map ido-completion-map)
@@ -219,7 +222,11 @@ Uses the currently active keymap."
                    (keybinding
                     (gethash command smex-command-keybindings)))
               (if keybinding
-                  (format "%s (%s)" command-name keybinding)
+		  (concat
+		   (format "%s" command-name)
+		   (propertize
+		    (format " (%s)" keybinding)
+		    'face 'smex-keybinding-face))
                 command-name)))
           command-items))
 
@@ -264,9 +271,11 @@ Uses the currently active keymap."
 (defun smex-background-update ()
   "Update Smex when Emacs has been idle for 20 seconds."
   (run-with-idle-timer 20 t
-                       '(lambda () (when (smex-detect-new-commands)
-                                     (smex-update-command-keybindings)
-                                     (smex-update)))))
+                       '(lambda ()
+			  (when (or (= 0 (hash-table-count smex-command-keybindings))
+				    (smex-detect-new-commands))
+			    (smex-update-command-keybindings)
+			    (smex-update)))))
 
 ;;;###autoload
 (defun smex-initialize ()
@@ -300,8 +309,8 @@ Uses the currently active keymap."
             (error (if (smex-save-file-not-empty-p)
                        (error "Invalid data in smex-save-file (%s). Can't restore history."
                               smex-save-file)
-                     (if (not (boundp 'smex-history)) (setq smex-history))
-                     (if (not (boundp 'smex-data))    (setq smex-data))))))
+                     (unless (boundp 'smex-history) (setq smex-history nil))
+                     (unless (boundp 'smex-data)    (setq smex-data nil))))))
       (setq smex-history nil smex-data nil))))
 
 (defun smex-save-history ()
