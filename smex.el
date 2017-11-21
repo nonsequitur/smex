@@ -519,9 +519,7 @@ sorted by frequency of use."
 
         ;; Creating resulting list
         (setq ad-return-value
-              (append acronym-matches
-                      ad-return-value))
+              (delete-dups (append acronym-matches ad-return-value))))))
 
-        (delete-dups ad-return-value))))
 (provide 'smex)
 ;;; smex.el ends here
