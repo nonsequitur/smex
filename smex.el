@@ -504,7 +504,7 @@ sorted by frequency of use."
 
 (defadvice ido-set-matches-1 (after ido-smex-acronym-matches activate)
   "Filters ido-matches by setting acronynms in front of the ad-return-value."
-  (if (and smex-acronyms (> (length ido-text) 1))
+  (if (and smex-acronyms (smex-already-running) (> (length ido-text) 1))
       (let ((regex (concat "^" (mapconcat 'char-to-string ido-text "[^-]*-")))
             (acronym-matches (list)))
 
