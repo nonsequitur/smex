@@ -510,10 +510,12 @@ sorted by frequency of use."
 
         ;; Creating the list of the results to be set as first
         (dolist (item items)
-          (if (string-match (concat regex "[^-]*$") item) ;; strict match
+          (if (string-match ido-text item) ;; exact match
               (add-to-list 'acronym-matches item)
-            (if (string-match regex item) ;; appending relaxed match
-                (add-to-list 'acronym-matches item t))))
+            (if (string-match (concat regex "[^-]*$") item) ;; strict match
+                (add-to-list 'acronym-matches item)
+              (if (string-match regex item) ;; relaxed match
+                  (add-to-list 'acronym-matches item t)))))
 
         ;; Creating resulting list
         (setq ad-return-value
