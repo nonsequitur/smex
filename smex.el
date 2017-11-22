@@ -35,10 +35,28 @@
   :group 'convenience
   :link '(emacs-library-link :tag "Lisp File" "smex.el"))
 
+(defcustom smex-acronyms t
+  "If non-nil, you can use acronyms instead of the whole command names.
+E.g.: 'ff' instead of 'find-file', or 'ffow' instead of
+'find-file-other-window."
+  :type 'boolean
+  :group 'smex)
+
 (defcustom smex-auto-update t
   "If non-nil, `Smex' checks for new commands each time it is run.
 Turn it off for minor speed improvements on older systems."
   :type 'boolean
+  :group 'smex)
+
+(defcustom smex-filter-alist nil
+  "List used by `Smex' to hide command names. Every command name that matches
+one of these regexes will be hide."
+  :type '(repeat regexp)
+  :initialize 'custom-initialize-default
+  :set (lambda (symbol value)
+         (when (fboundp 'smex-cache)
+           (set-default symbol value)
+           (smex-update)))
   :group 'smex)
 
 (defcustom smex-save-file (locate-user-emacs-file "smex-items" ".smex-items")
@@ -180,7 +198,12 @@ Set this to nil to disable fuzzy matching."
 
   (setq smex-cache (sort smex-cache 'smex-sorting-rules))
   (smex-restore-history)
-  (setq smex-ido-cache (smex-convert-for-ido smex-cache)))
+  (setq smex-ido-cache (smex-filter-commands
+                        (smex-convert-for-ido smex-cache))))
+
+(defun smex-filter-commands (commands)
+  (dolist (filter smex-filter-alist commands)
+    (cl-delete-if (lambda (item) (string-match filter item)) commands)))
 
 (defun smex-convert-for-ido (command-items)
   (mapcar (lambda (command-item) (symbol-name (car command-item))) command-items))
@@ -478,6 +501,50 @@ sorted by frequency of use."
         (if (and (setq list (cdr list)) s)
             (insert "\n "))))
     (insert "\n)\n")))
+
+(defadvice ido-set-matches-1 (after ido-smex-acronym-matches activate)
+  "Filters ITEMS by setting acronynms first."
+  (if (and smex-acronyms (smex-already-running) (> (length ido-text) 1))
+
+      ;; We use a hash table for the matches, <type> => <list of items>, where
+      ;; <type> can be one of (e.g. `ido-text' is "ff"):
+      ;; - strict: strict acronym match (i.e. "^f[^-]*-f[^-]*$");
+      ;; - relaxed: for relaxed match (i.e. "^f[^-]*-f[^-]*");
+      ;; - start: the text start with (i.e. "^ff.*");
+      ;; - contains: the text contains (i.e. ".*ff.*");
+      (let ((regex (concat "^" (mapconcat 'char-to-string ido-text "[^-]*-")))
+            (matches (make-hash-table :test 'eq)))
+
+        ;; Filtering
+        (dolist (item items)
+          (let ((key))
+            (cond
+             ;; strict match
+             ((string-match (concat regex "[^-]*$") item)
+              (setq key 'strict))
+
+             ;; relaxed match
+             ((string-match regex item)
+              (setq key 'relaxed))
+
+             ;; text that start with ido-text
+             ((string-match (concat "^" ido-text) item)
+              (setq key 'start))
+
+             ;; text that contains ido-text
+             ((string-match ido-text item)
+              (setq key 'contains)))
+
+            (when key
+              ;; We have a winner! Update its list.
+              (let ((list (gethash key matches ())))
+                (puthash key (push item list) matches)))))
+
+        ;; Finally, we can order and return the results
+        (setq ad-return-value (append (gethash 'strict matches)
+                                      (gethash 'relaxed matches)
+                                      (gethash 'start matches)
+                                      (gethash 'contains matches))))))
 
 (provide 'smex)
 ;;; smex.el ends here
