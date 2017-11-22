@@ -503,23 +503,48 @@ sorted by frequency of use."
     (insert "\n)\n")))
 
 (defadvice ido-set-matches-1 (after ido-smex-acronym-matches activate)
-  "Filters ido-matches by setting acronynms in front of the ad-return-value."
+  "Filters ITEMS by setting acronynms first."
   (if (and smex-acronyms (smex-already-running) (> (length ido-text) 1))
+
+      ;; We use a hash table for the matches, <type> => <list of items>, where
+      ;; <type> can be one of (e.g. `ido-text' is "ff"):
+      ;; - strict: strict acronym match (i.e. "^f[^-]*-f[^-]*$");
+      ;; - relaxed: for relaxed match (i.e. "^f[^-]*-f[^-]*");
+      ;; - start: the text start with (i.e. "^ff.*");
+      ;; - contains: the text contains (i.e. ".*ff.*");
       (let ((regex (concat "^" (mapconcat 'char-to-string ido-text "[^-]*-")))
-            (acronym-matches (list)))
+            (matches (make-hash-table :test 'eq)))
 
-        ;; Creating the list of the results to be set as first
+        ;; Filtering
         (dolist (item items)
-          (if (string-match ido-text item) ;; exact match
-              (add-to-list 'acronym-matches item)
-            (if (string-match (concat regex "[^-]*$") item) ;; strict match
-                (add-to-list 'acronym-matches item)
-              (if (string-match regex item) ;; relaxed match
-                  (add-to-list 'acronym-matches item t)))))
+          (let ((key))
+            (cond
+             ;; strict match
+             ((string-match (concat regex "[^-]*$") item)
+              (setq key 'strict))
 
-        ;; Creating resulting list
-        (setq ad-return-value
-              (delete-dups (append acronym-matches ad-return-value))))))
+             ;; relaxed match
+             ((string-match regex item)
+              (setq key 'relaxed))
+
+             ;; text that start with ido-text
+             ((string-match (concat "^" ido-text) item)
+              (setq key 'start))
+
+             ;; text that contains ido-text
+             ((string-match ido-text item)
+              (setq key 'contains)))
+
+            (when key
+              ;; We have a winner! Update its list.
+              (let ((list (gethash key matches ())))
+                (puthash key (push item list) matches)))))
+
+        ;; Finally, we can order and return the results
+        (setq ad-return-value (append (gethash 'strict matches)
+                                      (gethash 'relaxed matches)
+                                      (gethash 'start matches)
+                                      (gethash 'contains matches))))))
 
 (provide 'smex)
 ;;; smex.el ends here
