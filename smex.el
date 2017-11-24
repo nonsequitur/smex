@@ -41,6 +41,17 @@ Turn it off for minor speed improvements on older systems."
   :type 'boolean
   :group 'smex)
 
+(defcustom smex-filter-alist nil
+  "List used by `Smex' to hide command names. Every command name that matches
+one of these regexes will be hide."
+  :type '(repeat regexp)
+  :initialize 'custom-initialize-default
+  :set (lambda (symbol value)
+         (when (fboundp 'smex-cache)
+           (set-default symbol value)
+           (smex-update)))
+  :group 'smex)
+
 (defcustom smex-save-file (locate-user-emacs-file "smex-items" ".smex-items")
   "File in which the smex state is saved between Emacs sessions.
 Variables stored are: `smex-data', `smex-history'.
@@ -180,7 +191,12 @@ Set this to nil to disable fuzzy matching."
 
   (setq smex-cache (sort smex-cache 'smex-sorting-rules))
   (smex-restore-history)
-  (setq smex-ido-cache (smex-convert-for-ido smex-cache)))
+  (setq smex-ido-cache (smex-filter-commands
+                        (smex-convert-for-ido smex-cache))))
+
+(defun smex-filter-commands (commands)
+  (dolist (filter smex-filter-alist commands)
+    (cl-delete-if (lambda (item) (string-match filter item)) commands)))
 
 (defun smex-convert-for-ido (command-items)
   (mapcar (lambda (command-item) (symbol-name (car command-item))) command-items))

@@ -70,6 +70,9 @@ Additionally, you can teach Smex to auto-update after Emacs has
 been idle for 60 seconds: Call `(smex-auto-update)`; provide an integer
 argument for a custom time period in seconds.
 
+### Hiding commands
+Set `smex-filter-alist` is a list of regexes that you can use for hiding commands.
+
 ### Show unbound commands
 `smex-show-unbound-commands` shows frequently used commands that have
 no key bindings.
