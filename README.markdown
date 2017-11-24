@@ -49,6 +49,11 @@ next/previous match. `Enter` executes the selected command.
 `smex-major-mode-commands` runs Smex, limited to commands that
 are relevant to the active major mode. Try it with Dired or Magit.
 
+### Acronyms
+Set `smex-acronyms` to use acronyms instead of the whole command names.
+
+E.g.: `ff` instead of `find-file` or `ffow` instead of `find-file-other-window`
+
 ### Command help
 `C-h f`, while Smex is active, runs `describe-function` on the
 currently selected command.
