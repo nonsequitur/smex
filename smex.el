@@ -494,10 +494,10 @@ sorted by frequency of use."
 
       ;; We use a hash table for the matches, <type> => <list of items>, where
       ;; <type> can be one of (e.g. `ido-text' is "ff"):
-      ;; - strict: strict acronym match (i.e. "^f[^-]*-f[^-]*$");
-      ;; - relaxed: for relaxed match (i.e. "^f[^-]*-f[^-]*");
-      ;; - start: the text start with (i.e. "^ff.*");
-      ;; - contains: the text contains (i.e. ".*ff.*");
+      ;; - a-s: for acronym strict matching (i.e. "^f[^-]*-f[^-]*$");
+      ;; - a-r: for acronym relaxed matching (i.e. "^f[^-]*-f[^-]*");
+      ;; - prefix: the text start with (i.e. "^ff.*");
+      ;; - substring: the text contains (i.e. ".*ff.*");
       (let ((regex (concat "^" (mapconcat 'char-to-string ido-text "[^-]*-")))
             (matches (make-hash-table :test 'eq)))
 
@@ -507,19 +507,19 @@ sorted by frequency of use."
             (cond
              ;; strict match
              ((string-match (concat regex "[^-]*$") item)
-              (setq key 'strict))
+              (setq key 'a-s))
 
-             ;; relaxed match
+             ;; acronym matching
              ((string-match regex item)
-              (setq key 'relaxed))
+              (setq key 'a-r))
 
-             ;; text that start with ido-text
+             ;; prefix matching
              ((string-match (concat "^" ido-text) item)
-              (setq key 'start))
+              (setq key 'prefix))
 
-             ;; text that contains ido-text
+             ;; substring matching
              ((string-match ido-text item)
-              (setq key 'contains)))
+              (setq key 'substring)))
 
             (when key
               ;; We have a winner! Update its list.
@@ -527,10 +527,10 @@ sorted by frequency of use."
                 (puthash key (push item list) matches)))))
 
         ;; Finally, we can order and return the results
-        (setq ad-return-value (append (gethash 'strict matches)
-                                      (gethash 'relaxed matches)
-                                      (gethash 'start matches)
-                                      (gethash 'contains matches))))
+        (setq ad-return-value (append (gethash 'a-s matches)
+                                      (gethash 'a-r matches)
+                                      (gethash 'prefix matches)
+                                      (gethash 'substring matches))))
 
     ;; ...else, run the original ido-set-matches-1
     ad-do-it))
