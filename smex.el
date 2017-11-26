@@ -498,7 +498,9 @@ sorted by frequency of use."
       ;; - a-r: for acronym relaxed matching (i.e. "^f[^-]*-f[^-]*");
       ;; - prefix: the text start with (i.e. "^ff.*");
       ;; - substring: the text contains (i.e. ".*ff.*");
-      (let ((regex (concat "^" (mapconcat 'char-to-string ido-text "[^-]*-")))
+      (let ((regex (concat "^" (mapconcat
+                                (lambda (c) (regexp-quote (char-to-string c)))
+                                ido-text "[^-]*-")))
             (matches (make-hash-table :test 'eq)))
 
         ;; Filtering
