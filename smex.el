@@ -498,9 +498,13 @@ sorted by frequency of use."
       ;; - a-r: for acronym relaxed matching (i.e. "^f[^-]*-f[^-]*");
       ;; - prefix: the text start with (i.e. "^ff.*");
       ;; - substring: the text contains (i.e. ".*ff.*");
+      ;; - flex: flexible matching (i.e. ".*f.*f.*");
       (let ((regex (concat "^" (mapconcat
                                 (lambda (c) (regexp-quote (char-to-string c)))
                                 ido-text "[^-]*-")))
+            (flex-regex (mapconcat
+                         (lambda (c) (regexp-quote (char-to-string c)))
+                         ido-text ".*"))
             (matches (make-hash-table :test 'eq)))
 
         ;; Filtering
@@ -521,7 +525,11 @@ sorted by frequency of use."
 
              ;; substring matching
              ((and (not ido-enable-prefix) (string-match ido-text item))
-              (setq key 'substring)))
+              (setq key 'substring))
+
+             ;; flexible matching
+             ((and ido-enable-flex-matching (string-match flex-regex item))
+              (setq key 'flex)))
 
             (when key
               ;; We have a winner! Update its list.
@@ -532,7 +540,8 @@ sorted by frequency of use."
         (setq ad-return-value (append (gethash 'a-s matches)
                                       (gethash 'a-r matches)
                                       (gethash 'prefix matches)
-                                      (gethash 'substring matches))))
+                                      (gethash 'substring matches)
+                                      (gethash 'flex matches))))
 
     ;; ...else, run the original ido-set-matches-1
     ad-do-it))
