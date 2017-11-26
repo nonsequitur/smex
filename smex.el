@@ -520,7 +520,7 @@ sorted by frequency of use."
               (setq key 'prefix))
 
              ;; substring matching
-             ((string-match ido-text item)
+             ((and (not ido-enable-prefix) (string-match ido-text item))
               (setq key 'substring)))
 
             (when key
