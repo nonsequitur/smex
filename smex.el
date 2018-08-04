@@ -55,11 +55,6 @@ Must be set before initializing Smex."
   :type 'integer
   :group 'smex)
 
-(defcustom smex-prompt-string "M-x "
-  "String to display in the Smex prompt."
-  :type 'string
-  :group 'smex)
-
 (defcustom smex-flex-matching t
   "Enables Ido flex matching. On by default.
 Set this to nil to disable fuzzy matching."
@@ -139,17 +134,20 @@ Set this to nil to disable fuzzy matching."
                          initial-input 'extended-command-history (car choices))))
 
 (defun smex-prompt-with-prefix-arg ()
-  (if (not current-prefix-arg)
-      smex-prompt-string
-    (concat
-     (if (eq current-prefix-arg '-)
-         "- "
-       (if (integerp current-prefix-arg)
-           (format "%d " current-prefix-arg)
-         (if (= (car current-prefix-arg) 4)
-             "C-u "
-           (format "%d " (car current-prefix-arg)))))
-     smex-prompt-string)))
+  (let ((prompt-string
+	 (format "%s "
+		 (format-kbd-macro (this-single-command-keys)))))
+   (if (not current-prefix-arg)
+       prompt-string
+     (concat
+      (if (eq current-prefix-arg '-)
+          "- "
+	(if (integerp current-prefix-arg)
+            (format "%d " current-prefix-arg)
+          (if (= (car current-prefix-arg) 4)
+              "C-u "
+            (format "%d " (car current-prefix-arg)))))
+      prompt-string))))
 
 (defun smex-prepare-ido-bindings ()
   (define-key ido-completion-map (kbd "TAB") 'minibuffer-complete)
