@@ -1,3 +1,6 @@
+[![MELPA](https://melpa.org/packages/smex-badge.svg)](https://melpa.org/#/smex)
+[![MELPA Stable](https://stable.melpa.org/packages/smex-badge.svg)](https://stable.melpa.org/#/smex)
+
 ![Smex](https://sites.google.com/site/cumulatm/home/smex-logo.png)
 
 ## Smex
