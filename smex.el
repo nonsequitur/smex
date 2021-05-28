@@ -20,7 +20,7 @@
 ;; run (smex-initialize)
 ;;
 ;; Bind the following commands:
-;; smex, smex-major-mode-commands
+;; smex-M-x, smex-major-mode-commands
 ;;
 ;; For a detailed introduction see:
 ;; http://github.com/nonsequitur/smex/blob/master/README.markdown
@@ -84,7 +84,8 @@ Set this to nil to disable fuzzy matching."
 ;; Smex Interface
 
 ;;;###autoload
-(defun smex ()
+(defun smex-ido-M-x ()
+  "Read and execute a command using IDO."
   (interactive)
   (unless smex-initialized-p
     (smex-initialize))
@@ -94,6 +95,29 @@ Set this to nil to disable fuzzy matching."
          (smex-detect-new-commands)
          (smex-update))
     (smex-read-and-run smex-ido-cache)))
+
+;;;###autoload
+(define-obsolete-function-alias 'smex #'smex-ido-M-x "4.0")
+
+(defun smex-simple-M-x ()
+  "Read and execute a command using `completing-read'.
+
+Simple function is compatible with `completing-read' extensions like vertico and Selectrum."
+  (unless smex-initialized-p
+    (smex-initialize))
+  (and smex-auto-update
+       (smex-detect-new-commands)
+       (smex-update))
+  (let ((command (completing-read "M-x " smex-ido-cache)))
+    (smex--execute-command command)))
+
+;;;###autoload
+(defun smex-M-x ()
+  "Read a command name and execute it."
+  (interactive)
+  (if ido-mode
+      (smex-ido-M-x)
+    (smex-simple-M-x)))
 
 (defun smex-already-running ()
   (and (boundp 'ido-choice-list)
@@ -105,16 +129,22 @@ Set this to nil to disable fuzzy matching."
    (lambda (_) (smex-update) (smex-read-and-run smex-ido-cache ido-text))))
 
 (defun smex-read-and-run (commands &optional initial-input)
-  (let* ((chosen-item-name (smex-completing-read commands initial-input))
-         (chosen-item (intern chosen-item-name)))
+  "Select a command name from COMMANDS with IDO and execute it.
+INITIAL-INPUT is for initial input value of `ido-completing-read'."
+  (let ((chosen-item-name (smex-completing-read commands initial-input)))
+    (smex--execute-command chosen-item-name)))
+
+(defun smex--execute-command (command-name)
+  "Execute COMMAND-NAME and record Smex cache."
+  (let ((command (intern command-name)))
     (if smex-custom-action
         (let ((action smex-custom-action))
           (setq smex-custom-action nil)
-          (funcall action chosen-item))
+          (funcall action command))
       (unwind-protect
           (with-no-warnings ; Don't warn about interactive use of `execute-extended-command'
-            (execute-extended-command current-prefix-arg chosen-item-name))
-        (smex-rank chosen-item)))))
+            (execute-extended-command current-prefix-arg command-name))
+        (smex-rank command)))))
 
 ;;;###autoload
 (defun smex-major-mode-commands ()
